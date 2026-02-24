@@ -120,7 +120,8 @@ class MealPlannerViewModel {
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        // Parse date strings as local calendar dates; use a stable locale for parsing
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter
     }()
     
@@ -214,8 +215,13 @@ class MealPlannerViewModel {
             var groupedEntries: [Date: [ReadPlanEntry]] = [:]
             for entry in response.items {
                 if let entryDate = dateFormatter.date(from: entry.date) {
-                    let dayStart = Calendar.current.startOfDay(for: entryDate)
-                    groupedEntries[dayStart, default: []].append(entry)
+                    let calendar = Calendar.current
+                    let comps = calendar.dateComponents([.year, .month, .day], from: entryDate)
+                    if let dayStart = calendar.date(from: comps) {
+                        groupedEntries[dayStart, default: []].append(entry)
+                    } else {
+                        print("Warning: Could not build day start from components for date \(entry.date)")
+                    }
                 } else {
                     print("Warning: Could not parse date string \(entry.date)")
                 }
