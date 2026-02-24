@@ -5,17 +5,10 @@ struct CalendarMonthView: View {
     let mealPlanEntries: [Date: [ReadPlanEntry]]
     let selectedMonthDate: Date
     let baseURL: URL?
+    let calendar: Calendar
     let onDateSelected: (Date) -> Void
 
     @Environment(\.locale) private var locale
-
-    private var daysOfWeek: [String] {
-        var cal = Calendar.current
-        cal.locale = locale
-        let symbols = cal.veryShortWeekdaySymbols
-        let first = cal.firstWeekday - 1
-        return Array(symbols[first...]) + Array(symbols[..<first])
-    }
 
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
     
@@ -25,8 +18,9 @@ struct CalendarMonthView: View {
                 ForEach(days, id: \.self) { date in
                     CalendarDayCell(
                         date: date,
-                        entries: mealPlanEntries[Calendar.current.startOfDay(for: date)] ?? [],
-                        isCurrentMonth: Calendar.current.isDate(date, equalTo: selectedMonthDate, toGranularity: .month),
+                        entries: mealPlanEntries[calendar.startOfDay(for: date)] ?? [],
+                        isCurrentMonth: calendar.isDate(date, equalTo: selectedMonthDate, toGranularity: .month),
+                        calendar: calendar,
                         onTap: { onDateSelected(date) }
                     )
                     .frame(minHeight: 100, alignment: .topLeading)
@@ -40,6 +34,7 @@ struct CalendarDayCell: View {
     let date: Date
     let entries: [ReadPlanEntry]
     let isCurrentMonth: Bool
+    let calendar: Calendar
     let onTap: () -> Void
 
     @Environment(\.locale) private var locale
@@ -66,7 +61,7 @@ struct CalendarDayCell: View {
                 if isCurrentMonth {
                     Text(date.formatted(.dateTime.locale(locale).day()))
                         .font(.callout.bold())
-                        .fontWeight(Calendar.current.isDateInToday(date) ? .heavy : .regular)
+                        .fontWeight(calendar.isDateInToday(date) ? .heavy : .regular)
                         .foregroundColor(foregroundColorForDate)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 5)
@@ -101,7 +96,7 @@ struct CalendarDayCell: View {
     }
     
     private var foregroundColorForDate: Color {
-        if Calendar.current.isDateInToday(date) {
+        if calendar.isDateInToday(date) {
             return .red
         } else if isCurrentMonth {
             return .primary

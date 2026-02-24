@@ -7,11 +7,16 @@ struct MealPlannerView: View {
     @State private var selectedTabIndex = 1
     @State private var currentlyVisibleMonth: Date = Date().startOfMonth()
     @State private var scrollViewFrame: CGRect = .zero
-    private var daysOfWeek: [String] {
+    
+    private var localizedCalendar: Calendar {
         var cal = Calendar.current
         cal.locale = locale
-        let symbols = cal.veryShortWeekdaySymbols
-        let first = cal.firstWeekday - 1
+        return cal
+    }
+    
+    private var daysOfWeek: [String] {
+        let symbols = localizedCalendar.veryShortWeekdaySymbols
+        let first = localizedCalendar.firstWeekday - 1
         return Array(symbols[first...]) + Array(symbols[..<first])
     }
     
@@ -254,12 +259,14 @@ struct MealPlannerView: View {
                         ScrollView {
                             LazyVStack(spacing: 20) {
                                 ForEach(viewModel.displayedMonths, id: \.self) { monthStart in
+                                    let monthDays = localizedCalendar.generateDaysInMonth(for: monthStart)
                                     GeometryReader { monthProxy in
                                         CalendarMonthView(
-                                            days: viewModel.daysInSpecificMonth(monthStart),
+                                            days: monthDays,
                                             mealPlanEntries: viewModel.mealPlanEntries,
                                             selectedMonthDate: monthStart,
                                             baseURL: appState.apiClient?.baseURL,
+                                            calendar: localizedCalendar,
                                             onDateSelected: { date in
                                                 viewModel.selectDateAndView(date: date)
                                             }
@@ -267,7 +274,7 @@ struct MealPlannerView: View {
                                         .id(monthStart)
                                         .preference(key: VisibleMonthPreferenceKey.self, value: [MonthVisibilityInfo(month: monthStart, frame: monthProxy.frame(in: .global))])
                                     }
-                                    .frame(height: CGFloat(viewModel.daysInSpecificMonth(monthStart).count / 7) * 100)
+                                    .frame(height: CGFloat(monthDays.count / 7) * 100)
                                 }
                                 
                                 Color.clear
