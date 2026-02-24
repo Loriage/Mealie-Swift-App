@@ -490,6 +490,21 @@ class MealieAPIClient {
         let _: ReadPlanEntry = try await performRequest(for: request)
     }
     
+    /// Reschedule a meal plan entry to a different date by deleting and recreating it.
+    /// This avoids issues with unsupported PATCH/PUT methods on the mealplans endpoint.
+    func rescheduleMealPlanEntry(entryID: Int, to newDate: Date, recipeId: UUID?, entryType: String) async throws {
+        // Delete the old entry
+        try await deleteMealPlanEntry(entryID: entryID)
+        
+        // Recreate with the new date
+        if let recipeId = recipeId {
+            try await addMealPlanEntry(date: newDate, recipeId: recipeId, entryType: entryType)
+        } else {
+            // If no recipe, use random meal
+            let _ = try await addRandomMealPlanEntry(date: newDate, entryType: entryType)
+        }
+    }
+    
     func addRandomMealPlanEntry(date: Date, entryType: String) async throws -> ReadPlanEntry {
         let url = baseURL.appendingPathComponent("api/households/mealplans/random")
         var request = URLRequest(url: url)

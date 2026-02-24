@@ -49,7 +49,7 @@ class MealPlannerViewModel {
     var isImporting = false
     var importingListId: UUID? = nil
     var importSuccess = false
-    
+
     init() {
         setupInitialMonths()
     }
@@ -393,6 +393,27 @@ class MealPlannerViewModel {
         }
     }
     
+    /// Move an existing meal plan entry to a different day by deleting and recreating it.
+    func rescheduleMealEntry(entryID: Int, to newDate: Date, recipeId: UUID?, entryType: String) async {
+        guard let client = self.apiClient else {
+            errorMessage = "API Client non disponible."
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            try await client.rescheduleMealPlanEntry(entryID: entryID, to: newDate, recipeId: recipeId, entryType: entryType)
+            await loadMealPlan(apiClient: client)
+        } catch {
+            await MainActor.run {
+                errorMessage = "Erreur lors du déplacement : \(error.localizedDescription)"
+                isLoading = false
+            }
+        }
+    }
+
     @MainActor
     private func prepareImport(startDate: Date, endDate: Date, apiClient: MealieAPIClient?) {
         guard apiClient != nil else {

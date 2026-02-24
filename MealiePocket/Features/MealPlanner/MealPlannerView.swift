@@ -9,9 +9,16 @@ struct MealPlannerView: View {
     @State private var scrollViewFrame: CGRect = .zero
     private let daysOfWeek = ["L", "M", "M", "J", "V", "S", "D"]
     
+    // MARK: - rescheduling state
+    @State private var showingRescheduleSheet = false
+    @State private var entryToReschedule: ReadPlanEntry? = nil
+    @State private var rescheduleDate: Date = Date()
+    @State private var rescheduleMealType: String = "Dinner"
+    let mealTypes = ["Breakfast", "Lunch", "Dinner", "Side"]
+
     @State private var showingMealTypeSelection = false
     @State private var selectedMealType = "Dinner"
-    let mealTypes = ["Breakfast", "Lunch", "Dinner", "Side"]
+    
     
     @Environment(\.dismiss) var dismiss
     
@@ -176,6 +183,51 @@ struct MealPlannerView: View {
                 Text("Error: Date not selected.")
             }
         }
+        // rescheduling sheet
+        .sheet(isPresented: $showingRescheduleSheet) {
+            if let entry = entryToReschedule {
+                // compute original date once to avoid recreating the formatter multiple times
+                let originalDate: Date = {
+                    let fmt = DateFormatter()
+                    fmt.dateFormat = "yyyy-MM-dd"
+                    return fmt.date(from: entry.date) ?? Date()
+                }()
+                VStack(spacing: 20) {
+                    Text("Reschedule Meal")
+                        .font(.headline)
+                    
+                    DatePicker("New date", selection: $rescheduleDate, displayedComponents: .date)
+                        .datePickerStyle(.graphical)
+                        .labelsHidden()
+                    
+                    Picker("Meal type", selection: $rescheduleMealType) {
+                        ForEach(mealTypes, id: \.self) { type in
+                            Text(type).tag(type)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    
+                    HStack {
+                        Button("Cancel") {
+                            showingRescheduleSheet = false
+                        }
+                        Spacer()
+                        Button("Move") {
+                            Task {
+                                await viewModel.rescheduleMealEntry(entryID: entry.id, to: rescheduleDate, recipeId: entry.recipeId, entryType: rescheduleMealType)
+                            }
+                            showingRescheduleSheet = false
+                        }
+                        .disabled(rescheduleDate == originalDate && rescheduleMealType == entry.entryType)
+                    }
+                    .padding(.horizontal)
+                }
+                .padding()
+            } else {
+                Text("No entry to move.")
+            }
+        }
+        // Planner UI: rescheduling supported via context menu and sheet.
         .sheet(isPresented: Binding(
             get: { viewModel.showingDateRangePicker },
             set: { viewModel.showingDateRangePicker = $0}
@@ -445,6 +497,17 @@ struct MealPlannerView: View {
                 }
             } label: {
                 Label("Delete", systemImage: "trash")
+            }
+            
+            Button {
+                entryToReschedule = entry
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd"
+                rescheduleDate = formatter.date(from: entry.date) ?? Date()
+                rescheduleMealType = entry.entryType.capitalized
+                showingRescheduleSheet = true
+            } label: {
+                Label("Reschedule", systemImage: "calendar")
             }
         }
     }

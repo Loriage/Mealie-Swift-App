@@ -1305,6 +1305,9 @@
         }
       }
     },
+    "Meal type" : {
+
+    },
     "Meal Type" : {
       "localizations" : {
         "en" : {
@@ -1337,6 +1340,9 @@
         }
       }
     },
+    "Move" : {
+
+    },
     "Name" : {
       "localizations" : {
         "en" : {
@@ -1368,6 +1374,9 @@
           }
         }
       }
+    },
+    "New date" : {
+
     },
     "New Item" : {
       "localizations" : {
@@ -1448,6 +1457,9 @@
           }
         }
       }
+    },
+    "No entry to move." : {
+
     },
     "No favorites found" : {
       "localizations" : {
@@ -1979,6 +1991,12 @@
           }
         }
       }
+    },
+    "Reschedule" : {
+
+    },
+    "Reschedule Meal" : {
+
     },
     "Save" : {
       "localizations" : {
