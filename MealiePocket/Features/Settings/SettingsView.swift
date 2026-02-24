@@ -131,6 +131,8 @@ struct ApplicationSettingsView: View {
 }
 
 struct AboutView: View {
+    @State private var isShowingShareSheet = false
+    
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
@@ -169,6 +171,9 @@ struct AboutView: View {
 
     private static let fallbackGitHubURL = URL(string: "https://github.com/Loriage/Mealie-Swift-App/issues")!
     private static let fallbackEmailURL = URL(string: "mailto:contact@nohit.dev")!
+
+    private static let appStoreURL = URL(string: "https://apps.apple.com/us/app/pocket-for-mealie/id6758108960")!
+    private static let reviewURL = URL(string: "https://apps.apple.com/app/id6758108960?action=write-review")!
 
     private var bugReportGitHubURL: URL {
         var components = URLComponents(string: "https://github.com/Loriage/Mealie-Swift-App/issues/new")
@@ -222,33 +227,33 @@ struct AboutView: View {
                 }
                 .listRowBackground(Color.clear)
             }
-
+            
             Section {
+                Button {
+                    isShowingShareSheet = true
+                } label: {
+                    Label("settings.about.share", systemImage: "square.and.arrow.up")
+                }
+                .foregroundStyle(.primary)
+                
+                Link(destination: Self.reviewURL) {
+                    Label("settings.about.review", systemImage: "star.fill")
+                }
+                .foregroundStyle(.primary)
+                
                 Link(destination: bugReportGitHubURL) {
-                    HStack {
-                        Image(systemName: "ant")
-                        Text("settings.support.reportBug.github")
-                        Spacer()
-                        Image(systemName: "arrow.up.forward.app")
-                            .foregroundColor(.secondary)
-                    }
+                    Label("settings.about.reportIssue", systemImage: "exclamationmark.bubble")
                 }
-
-                Link(destination: bugReportEmailURL) {
-                    HStack {
-                        Image(systemName: "envelope")
-                        Text("settings.support.reportBug.email")
-                        Spacer()
-                        Image(systemName: "arrow.up.forward.app")
-                            .foregroundColor(.secondary)
-                    }
-                }
+                .foregroundStyle(.primary)
             } header: {
-                Text("settings.support")
+                Text("settings.about")
             }
         }
         .navigationTitle("settings.about.title")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $isShowingShareSheet) {
+            ShareSheet(items: [Self.appStoreURL])
+        }
     }
 }
 
@@ -471,4 +476,14 @@ struct SettingsIconView: View {
                 .foregroundColor(.white)
         }
     }
+}
+
+private struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
