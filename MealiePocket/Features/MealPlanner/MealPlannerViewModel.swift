@@ -122,12 +122,19 @@ class MealPlannerViewModel {
         return Calendar.current.generateDates(for: weekInterval, matching: DateComponents(hour: 0, minute: 0, second: 0))
     }
     
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        return formatter
-    }()
+    private func calendarDateString(from date: Date) -> String {
+        let c = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        return String(format: "%04d-%02d-%02d", c.year!, c.month!, c.day!)
+    }
+
+    private func calendarDate(from string: String) -> Date? {
+        let parts = string.split(separator: "-")
+        guard parts.count == 3,
+              let year = Int(parts[0]),
+              let month = Int(parts[1]),
+              let day = Int(parts[2]) else { return nil }
+        return Calendar.current.date(from: DateComponents(year: year, month: month, day: day))
+    }
     
     func changeDate(_ direction: Int) {
         let component: Calendar.Component = viewMode == .day ? .day : (viewMode == .week ? .weekOfYear : .month)
@@ -209,8 +216,8 @@ class MealPlannerViewModel {
         errorMessage = nil
         
         let interval = dateIntervalForAPI
-        let startDateString = dateFormatter.string(from: interval.start)
-        let endDateString = dateFormatter.string(from: interval.end)
+        let startDateString = calendarDateString(from: interval.start)
+        let endDateString = calendarDateString(from: interval.end)
         
         do {
             let perPage = viewMode == .month ? 1000 : 100
@@ -218,8 +225,7 @@ class MealPlannerViewModel {
             
             var groupedEntries: [Date: [ReadPlanEntry]] = [:]
             for entry in response.items {
-                if let entryDate = dateFormatter.date(from: entry.date) {
-                    let dayStart = Calendar.current.startOfDay(for: entryDate)
+                if let dayStart = calendarDate(from: entry.date) {
                     groupedEntries[dayStart, default: []].append(entry)
                 } else {
                     print("Warning: Could not parse date string \(entry.date)")
