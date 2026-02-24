@@ -492,9 +492,15 @@ struct MealPlannerView: View {
             
             VStack(alignment: .leading, spacing: isMonthView ? 0 : 2) {
                 if !isMonthView && (showType || viewModel.viewMode == .day) {
-                    Text(entry.entryType.capitalized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    if let mealTypeKey = localizedMealTypeKey(entry.entryType) {
+                        Text(mealTypeKey)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text(verbatim: entry.entryType.capitalized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 Text(recipeName ?? (entry.title.isEmpty ? entry.text : entry.title))
                     .font(isMonthView ? .system(size: 9) : .body)
@@ -582,6 +588,16 @@ struct MealPlannerView: View {
         case "dinner": return "moon.fill"
         case "side": return "fork.knife"
         default: return "note.text"
+        }
+    }
+    
+    private func localizedMealTypeKey(_ type: String) -> LocalizedStringKey? {
+        switch type.lowercased() {
+        case "breakfast": return "Breakfast"
+        case "lunch": return "Lunch"
+        case "dinner": return "Dinner"
+        case "side": return "Side"
+        default: return nil
         }
     }
 }
