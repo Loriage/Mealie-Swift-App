@@ -43,7 +43,7 @@ struct MealPlannerView: View {
                     set: { viewModel.viewMode = $0 }
                 )) {
                     ForEach(MealPlannerViewModel.ViewMode.allCases) { mode in
-                        Text(mode.rawValue).tag(mode)
+                        Text(LocalizedStringKey(mode.rawValue)).tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
