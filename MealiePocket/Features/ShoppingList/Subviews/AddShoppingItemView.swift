@@ -3,6 +3,7 @@ import SwiftUI
 struct AddShoppingItemView: View {
     @Bindable var viewModel: ShoppingListDetailViewModel
     @Environment(\.dismiss) var dismiss
+    @Environment(\.locale) private var locale
 
     var body: some View {
         NavigationView {
@@ -46,6 +47,7 @@ struct AddShoppingItemView: View {
         let formatter = NumberFormatter()
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 2
+        formatter.locale = locale
         return formatter.string(from: NSNumber(value: quantity)) ?? "\(quantity)"
     }
 }

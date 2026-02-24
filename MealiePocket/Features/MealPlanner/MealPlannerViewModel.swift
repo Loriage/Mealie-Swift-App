@@ -4,10 +4,15 @@ import SwiftUI
 @Observable
 class MealPlannerViewModel {
     enum ViewMode: String, CaseIterable, Identifiable {
-        case day = "Jour"
-        case week = "Semaine"
-        case month = "Mois"
-        var id: String { self.rawValue }
+        case day, week, month
+        var id: String { rawValue }
+        var label: LocalizedStringKey {
+            switch self {
+            case .day:   return "planner.viewMode.day"
+            case .week:  return "planner.viewMode.week"
+            case .month: return "planner.viewMode.month"
+            }
+        }
     }
     
     var selectedDate = Date()
@@ -191,7 +196,7 @@ class MealPlannerViewModel {
         }
         
         guard let client = self.apiClient else {
-            errorMessage = "API Client non disponible."
+            errorMessage = String(localized: "error.apiClientUnavailable")
             isLoading = false
             isLoadingPast = false
             isLoadingFuture = false
@@ -231,7 +236,7 @@ class MealPlannerViewModel {
             }
         } catch {
             await MainActor.run {
-                errorMessage = "Erreur de chargement du planning: \(error.localizedDescription)"
+                errorMessage = String(localized: "error.loadingPlan") + ": " + error.localizedDescription
                 self.isLoading = false
                 self.isLoadingPast = false
                 self.isLoadingFuture = false
@@ -327,7 +332,7 @@ class MealPlannerViewModel {
     
     func addSelectedRecipeToPlan(recipe: RecipeSummary, mealType: String, apiClient: MealieAPIClient?) async {
         guard let date = dateForAddingRecipe, let apiClient = apiClient else {
-            errorMessage = "Erreur: Date ou client API manquant."
+            errorMessage = String(localized: "error.missingDateOrClient")
             return
         }
         
@@ -343,15 +348,15 @@ class MealPlannerViewModel {
             }
         } catch {
             await MainActor.run {
-                errorMessage = "Erreur lors de l'ajout au planning: \(error.localizedDescription)"
+                errorMessage = String(localized: "error.addingMeal") + ": " + error.localizedDescription
                 isLoading = false
             }
         }
     }
-    
+
     func addRandomMeal(date: Date, mealType: String) async {
         guard let date = dateForAddingRecipe, let apiClient = apiClient else {
-            errorMessage = "API Client non disponible."
+            errorMessage = String(localized: "error.apiClientUnavailable")
             return
         }
         
@@ -367,15 +372,15 @@ class MealPlannerViewModel {
             }
         } catch {
             await MainActor.run {
-                errorMessage = "Erreur lors de l'ajout aléatoire : \(error.localizedDescription)"
+                errorMessage = String(localized: "error.randomMeal") + ": " + error.localizedDescription
                 isLoading = false
             }
         }
     }
-    
+
     func deleteMealEntry(entryID: Int) async {
         guard let client = self.apiClient else {
-            errorMessage = "API Client non disponible."
+            errorMessage = String(localized: "error.apiClientUnavailable")
             return
         }
         
@@ -387,16 +392,16 @@ class MealPlannerViewModel {
             await loadMealPlan(apiClient: client)
         } catch {
             await MainActor.run {
-                errorMessage = "Erreur lors de la suppression : \(error.localizedDescription)"
+                errorMessage = String(localized: "error.deletingMeal") + ": " + error.localizedDescription
                 isLoading = false
             }
         }
     }
-    
+
     @MainActor
     private func prepareImport(startDate: Date, endDate: Date, apiClient: MealieAPIClient?) {
         guard apiClient != nil else {
-            errorMessage = "API Client not available."
+            errorMessage = String(localized: "error.apiClientUnavailable")
             return
         }
         
@@ -447,7 +452,7 @@ class MealPlannerViewModel {
     @MainActor
     func loadShoppingLists() async {
         guard let apiClient else {
-            importErrorMessage = "API Client not available."
+            importErrorMessage = String(localized: "error.apiClientUnavailable")
             return
         }
         
@@ -467,7 +472,7 @@ class MealPlannerViewModel {
     @MainActor
     func importMealsToShoppingList(list: ShoppingListSummary) async {
         guard let apiClient else {
-            importErrorMessage = "API Client not available."
+            importErrorMessage = String(localized: "error.apiClientUnavailable")
             return
         }
         

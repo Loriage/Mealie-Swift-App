@@ -7,12 +7,19 @@ struct MealPlannerView: View {
     @State private var selectedTabIndex = 1
     @State private var currentlyVisibleMonth: Date = Date().startOfMonth()
     @State private var scrollViewFrame: CGRect = .zero
-    private let daysOfWeek = ["L", "M", "M", "J", "V", "S", "D"]
+    private var daysOfWeek: [String] {
+        var cal = Calendar.current
+        cal.locale = locale
+        let symbols = cal.veryShortWeekdaySymbols
+        let first = cal.firstWeekday - 1
+        return Array(symbols[first...]) + Array(symbols[..<first])
+    }
     
     @State private var showingMealTypeSelection = false
     @State private var selectedMealType = "Dinner"
     let mealTypes = ["Breakfast", "Lunch", "Dinner", "Side"]
     
+    @Environment(\.locale) private var locale
     @Environment(\.dismiss) var dismiss
     
     @Namespace var unionNamespace
@@ -34,7 +41,7 @@ struct MealPlannerView: View {
             
             if viewModel.isLoadingFuture { ProgressView().progressViewStyle(.circular) }
         }
-        .navigationTitle("Planner")
+        .navigationTitle("planner.navigationTitle")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .principal) {
@@ -43,7 +50,7 @@ struct MealPlannerView: View {
                     set: { viewModel.viewMode = $0 }
                 )) {
                     ForEach(MealPlannerViewModel.ViewMode.allCases) { mode in
-                        Text(mode.rawValue).tag(mode)
+                        Text(mode.label).tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -51,7 +58,7 @@ struct MealPlannerView: View {
         }
         .overlay(alignment: .bottom) {
             HStack {
-                Button("Today") {
+                Button("planner.today") {
                     viewModel.goToToday(apiClient: appState.apiClient)
                 }
                 .font(.headline)
@@ -150,7 +157,7 @@ struct MealPlannerView: View {
             if let date = viewModel.dateForAddingRecipe {
                 SelectRecipeForDayView(viewModel: viewModel, date: date, apiClient: appState.apiClient)
             } else {
-                Text("Error: Date not selected.")
+                Text("planner.errorDateNotSelected")
             }
         }
         .sheet(isPresented: Binding(
@@ -173,7 +180,7 @@ struct MealPlannerView: View {
                 )
                 .presentationDetents([.height(200)])
             } else {
-                Text("Error: Date not selected.")
+                Text("planner.errorDateNotSelected")
             }
         }
         .sheet(isPresented: Binding(
@@ -198,7 +205,7 @@ struct MealPlannerView: View {
             if viewModel.viewMode == .month {
                 HStack {
                     Spacer()
-                    Text(currentlyVisibleMonth.formatted(.dateTime.month(.wide).year()))
+                    Text(currentlyVisibleMonth.formatted(.dateTime.locale(locale).month(.wide).year()))
                         .font(.headline)
                         .id(currentlyVisibleMonth)
                     Spacer()
@@ -331,9 +338,9 @@ struct MealPlannerView: View {
             ForEach(days, id: \.self) { date in
                 VStack(alignment: .leading) {
                     HStack(spacing: 2) {
-                        Text(date.formatted(.dateTime.weekday(.wide)))
+                        Text(date.formatted(.dateTime.locale(locale).weekday(.wide)))
                             .font(.headline)
-                        Text(date.formatted(.dateTime.day()))
+                        Text(date.formatted(.dateTime.locale(locale).day()))
                             .font(.headline)
                             .bold(Calendar.current.isDateInToday(date))
                         Spacer()
@@ -405,7 +412,7 @@ struct MealPlannerView: View {
         
         if entries.isEmpty {
             if viewModel.viewMode == .day {
-                Text("Nothing planned that day.")
+                Text("planner.nothingPlanned")
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top)
@@ -512,28 +519,28 @@ struct MealPlannerView: View {
     
     private var dateRangeTitle: String {
         let dateToShow = viewModel.viewMode == .month ? currentlyVisibleMonth : viewModel.selectedDate
-        
+
         switch viewModel.viewMode {
         case .day:
-            return dateToShow.formatted(date: .complete, time: .omitted)
+            return dateToShow.formatted(Date.FormatStyle(date: .complete, time: .omitted).locale(locale))
         case .week:
             guard let interval = Calendar.current.dateInterval(of: .weekOfYear, for: dateToShow) else { return "" }
             let start = interval.start
             let end = interval.end.addingTimeInterval(-1)
-            
+
             let startYear = Calendar.current.component(.year, from: start)
             let endYear = Calendar.current.component(.year, from: end)
-            
-            let monthDayFormat = Date.FormatStyle().month(.abbreviated).day()
-            let monthDayYearFormat = Date.FormatStyle().month(.abbreviated).day().year()
-            
+
+            let monthDayFormat = Date.FormatStyle().locale(locale).month(.abbreviated).day()
+            let monthDayYearFormat = Date.FormatStyle().locale(locale).month(.abbreviated).day().year()
+
             if startYear == endYear {
                 return "\(start.formatted(monthDayFormat)) - \(end.formatted(monthDayFormat)), \(startYear)"
             } else {
                 return "\(start.formatted(monthDayYearFormat)) - \(end.formatted(monthDayYearFormat))"
             }
         case .month:
-            return dateToShow.formatted(.dateTime.month(.wide).year())
+            return dateToShow.formatted(.dateTime.locale(locale).month(.wide).year())
         }
     }
     

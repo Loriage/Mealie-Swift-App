@@ -205,10 +205,13 @@ struct ShoppingListItemRow: View {
         }
     }
 
+     @Environment(\.locale) private var locale
+
      private func formattedQuantity(_ quantity: Double) -> String {
          let formatter = NumberFormatter()
          formatter.minimumFractionDigits = 0
          formatter.maximumFractionDigits = 2
+         formatter.locale = locale
          return formatter.string(from: NSNumber(value: quantity)) ?? "\(quantity)"
      }
 }

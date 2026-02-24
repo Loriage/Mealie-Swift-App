@@ -3,64 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(AppState.self) private var appState
     @State private var viewModel = SettingsViewModel()
-    
-    private var appVersion: String {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
-        return "\(version) (\(build))"
-    }
-    
-    private var bugReportTemplate: String {
-            """
-            ## Bug Description
-            <!-- Describe the bug clearly and concisely -->
-            
-            
-            ## Steps to Reproduce
-            1.
-            2.
-            3.
-            
-            ## Expected Behavior
-            <!-- What did you expect to happen? -->
-            
-            
-            ## Actual Behavior
-            <!-- What actually happened? -->
-            
-            
-            ## Screenshots
-            <!-- If applicable, add screenshots to help explain the issue -->
-            
-            
-            ## Device Information
-            - App Version: \(appVersion)
-            - iOS Version: \(UIDevice.current.systemVersion)
-            - Device: \(UIDevice.current.model)
-            """
-    }
-    
-    private static let fallbackGitHubURL = URL(string: "https://github.com/Loriage/Mealie-Swift-App/issues")!
-    private static let fallbackEmailURL = URL(string: "mailto:contact@nohit.dev")!
-        
-    private var bugReportGitHubURL: URL {
-        var components = URLComponents(string: "https://github.com/Loriage/Mealie-Swift-App/issues/new")
-        components?.queryItems = [
-            URLQueryItem(name: "title", value: "[Bug] "),
-            URLQueryItem(name: "body", value: bugReportTemplate)
-        ]
-        return components?.url ?? Self.fallbackGitHubURL
-    }
-        
-    private var bugReportEmailURL: URL {
-        var components = URLComponents(string: "mailto:contact@nohit.dev")
-        components?.queryItems = [
-            URLQueryItem(name: "subject", value: "[Bug Report] Beszel Companion"),
-            URLQueryItem(name: "body", value: bugReportTemplate)
-        ]
-        return components?.url ?? Self.fallbackEmailURL
-    }
-    
+
     var body: some View {
         Group {
             List {
@@ -72,7 +15,7 @@ struct SettingsView: View {
                                     .resizable()
                                     .frame(width: 40, height: 40)
                                     .foregroundColor(.gray)
-                                
+
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(user.fullName ?? "User")
                                         .font(.headline)
@@ -86,25 +29,23 @@ struct SettingsView: View {
                         }
                     }
                 }
-                
-                Section("General") {
+
+                Section("Mealie") {
                     NavigationLink(destination: ServerInfoView(viewModel: viewModel)) {
                         HStack(spacing: 12) {
                             SettingsIconView(icon: "server.rack", color: .blue)
-                            Text("Server & Application")
+                            Text("settings.server.nav")
                         }
                     }
-                    
+
                     NavigationLink(destination: StatisticsView(stats: viewModel.householdStats)) {
                         HStack(spacing: 12) {
                             SettingsIconView(icon: "chart.bar.xaxis", color: .orange)
                             Text("Statistics")
                         }
                     }
-                }
-                
-                if appState.currentUser?.admin == true {
-                    Section("Administration") {
+
+                    if appState.currentUser?.admin == true {
                         NavigationLink(destination: AdminDashboardView(viewModel: viewModel)) {
                             HStack(spacing: 12) {
                                 SettingsIconView(icon: "wrench.and.screwdriver.fill", color: .gray)
@@ -113,29 +54,21 @@ struct SettingsView: View {
                         }
                     }
                 }
-                
-                Section {
-                    Link(destination: bugReportGitHubURL) {
-                        HStack {
-                            Image(systemName: "ant")
-                            Text("settings.support.reportBug.github")
-                            Spacer()
-                            Image(systemName: "arrow.up.forward.app")
-                                .foregroundColor(.secondary)
+
+                Section("App") {
+                    NavigationLink(destination: ApplicationSettingsView()) {
+                        HStack(spacing: 12) {
+                            SettingsIconView(icon: "paintpalette", color: .purple)
+                            Text("settings.application.title")
                         }
                     }
-                    
-                    Link(destination: bugReportEmailURL) {
-                        HStack {
-                            Image(systemName: "envelope")
-                            Text("settings.support.reportBug.email")
-                            Spacer()
-                            Image(systemName: "arrow.up.forward.app")
-                                .foregroundColor(.secondary)
+
+                    NavigationLink(destination: AboutView()) {
+                        HStack(spacing: 12) {
+                            SettingsIconView(icon: "info.circle.fill", color: .teal)
+                            Text("settings.about.title")
                         }
                     }
-                } header: {
-                    Text("settings.support")
                 }
 
                 Section {
@@ -148,10 +81,6 @@ struct SettingsView: View {
                             Spacer()
                         }
                     }
-                } footer: {
-                    Text("Version \(appVersion)")
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, 8)
                 }
             }
         }
@@ -169,9 +98,163 @@ struct SettingsView: View {
     }
 }
 
+struct ApplicationSettingsView: View {
+    @Environment(DisplaySettings.self) private var displaySettings
+
+    var body: some View {
+        @Bindable var settings = displaySettings
+        List {
+            Section("settings.application.language") {
+                Picker(selection: $settings.languageCode) {
+                    Text("settings.language.system").tag("system")
+                    Text("settings.language.english").tag("en")
+                    Text("settings.language.french").tag("fr")
+                } label: {
+                    Label("settings.application.language", systemImage: "globe")
+                        .foregroundStyle(.primary)
+                }
+            }
+            Section("settings.application.theme") {
+                Picker(selection: $settings.theme) {
+                    ForEach(AppTheme.allCases) { theme in
+                        Text(theme.label).tag(theme)
+                    }
+                } label: {
+                    Label("settings.application.theme", systemImage: "circle.lefthalf.filled")
+                        .foregroundStyle(.primary)
+                }
+            }
+        }
+        .navigationTitle("settings.application.title")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct AboutView: View {
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+        return "\(version) (\(build))"
+    }
+
+    private var bugReportTemplate: String {
+        """
+        ## Bug Description
+        <!-- Describe the bug clearly and concisely -->
+
+
+        ## Steps to Reproduce
+        1.
+        2.
+        3.
+
+        ## Expected Behavior
+        <!-- What did you expect to happen? -->
+
+
+        ## Actual Behavior
+        <!-- What actually happened? -->
+
+
+        ## Screenshots
+        <!-- If applicable, add screenshots to help explain the issue -->
+
+
+        ## Device Information
+        - App Version: \(appVersion)
+        - iOS Version: \(UIDevice.current.systemVersion)
+        - Device: \(UIDevice.current.model)
+        """
+    }
+
+    private static let fallbackGitHubURL = URL(string: "https://github.com/Loriage/Mealie-Swift-App/issues")!
+    private static let fallbackEmailURL = URL(string: "mailto:contact@nohit.dev")!
+
+    private var bugReportGitHubURL: URL {
+        var components = URLComponents(string: "https://github.com/Loriage/Mealie-Swift-App/issues/new")
+        components?.queryItems = [
+            URLQueryItem(name: "title", value: "[Bug] "),
+            URLQueryItem(name: "body", value: bugReportTemplate)
+        ]
+        return components?.url ?? Self.fallbackGitHubURL
+    }
+
+    private var bugReportEmailURL: URL {
+        var components = URLComponents(string: "mailto:contact@nohit.dev")
+        components?.queryItems = [
+            URLQueryItem(name: "subject", value: "[Bug Report] Pocket for Mealie"),
+            URLQueryItem(name: "body", value: bugReportTemplate)
+        ]
+        return components?.url ?? Self.fallbackEmailURL
+    }
+
+    private var appIcon: UIImage? {
+        guard
+            let icons = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any],
+            let primary = icons["CFBundlePrimaryIcon"] as? [String: Any],
+            let files = primary["CFBundleIconFiles"] as? [String],
+            let name = files.last
+        else { return nil }
+        return UIImage(named: name)
+    }
+
+    var body: some View {
+        List {
+            Section {
+                HStack {
+                    Spacer()
+                    VStack(spacing: 10) {
+                        if let icon = appIcon {
+                            Image(uiImage: icon)
+                                .resizable()
+                                .frame(width: 80, height: 80)
+                                .clipShape(RoundedRectangle(cornerRadius: 18))
+                        }
+                        Text("Pocket for Mealie")
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                        Text(appVersion)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 12)
+                    Spacer()
+                }
+                .listRowBackground(Color.clear)
+            }
+
+            Section {
+                Link(destination: bugReportGitHubURL) {
+                    HStack {
+                        Image(systemName: "ant")
+                        Text("settings.support.reportBug.github")
+                        Spacer()
+                        Image(systemName: "arrow.up.forward.app")
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                Link(destination: bugReportEmailURL) {
+                    HStack {
+                        Image(systemName: "envelope")
+                        Text("settings.support.reportBug.email")
+                        Spacer()
+                        Image(systemName: "arrow.up.forward.app")
+                            .foregroundColor(.secondary)
+                    }
+                }
+            } header: {
+                Text("settings.support")
+            }
+        }
+        .navigationTitle("settings.about.title")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 struct UserProfileView: View {
     let user: User
-    
+
     var body: some View {
         List {
             Section("Identity") {
@@ -179,7 +262,7 @@ struct UserProfileView: View {
                 ServerInfoRow(title: "Full Name", value: user.fullName ?? "N/A")
                 ServerInfoRow(title: "Email", value: user.email)
             }
-            
+
             Section("Permissions") {
                 ServerInfoRow(title: "Group", value: user.group)
                 ServerInfoRow(title: "Household", value: user.household)
@@ -194,8 +277,9 @@ struct UserProfileView: View {
 struct ServerInfoView: View {
     var viewModel: SettingsViewModel
     @Environment(AppState.self) private var appState
+    @Environment(\.locale) private var locale
     @State private var isAlertPresented = false
-    
+
     var body: some View {
         List {
             Section("Connection") {
@@ -205,9 +289,9 @@ struct ServerInfoView: View {
                     onCopy: { copyToClipboard(appState.apiClient?.baseURL.absoluteString) }
                 )
                 ServerInfoRow(title: "Auth Method", value: appState.authMethod?.rawValue.capitalized ?? "N/A")
-                ServerInfoRow(title: "Last Login", value: appState.loginTime?.formatted(date: .abbreviated, time: .shortened) ?? "N/A")
+                ServerInfoRow(title: "Last Login", value: appState.loginTime?.formatted(Date.FormatStyle(date: .abbreviated, time: .shortened, locale: locale)) ?? "N/A")
             }
-            
+
             if let appInfo = viewModel.appInfo {
                 Section("Application Details") {
                     ServerInfoRow(title: "Mealie Version", value: appInfo.version)
@@ -217,11 +301,11 @@ struct ServerInfoView: View {
                 }
             }
         }
-        .navigationTitle("Server Info")
+        .navigationTitle("settings.server.nav")
         .navigationBarTitleDisplayMode(.inline)
         .alert("Copied!", isPresented: $isAlertPresented) { Button("OK", role: .cancel) { } }
     }
-    
+
     private func copyToClipboard(_ text: String?) {
         guard let text else { return }
         UIPasteboard.general.string = text
@@ -232,7 +316,7 @@ struct ServerInfoView: View {
 
 struct StatisticsView: View {
     let stats: HouseholdStatistics?
-    
+
     var body: some View {
         List {
             if let stats = stats {
@@ -259,7 +343,7 @@ struct StatisticsView: View {
 struct AdminDashboardView: View {
     @Bindable var viewModel: SettingsViewModel
     @Environment(AppState.self) private var appState
-    
+
     var body: some View {
         List {
             Section("Logs") {
@@ -270,7 +354,7 @@ struct AdminDashboardView: View {
                     }
                 }
             }
-            
+
             Section("Backups") {
                 Button {
                     Task { await viewModel.createBackup(apiClient: appState.apiClient) }
@@ -284,7 +368,7 @@ struct AdminDashboardView: View {
                 .disabled(viewModel.isCleaning || viewModel.isCreatingBackup)
                 .foregroundStyle(Color.blue)
             }
-            
+
             Section("Maintenance") {
                 Button {
                     Task { await viewModel.runCleanImages(apiClient: appState.apiClient) }
@@ -311,7 +395,6 @@ struct AdminDashboardView: View {
                 .foregroundStyle(.red)
             }
             .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
-            
 
             if viewModel.isCleaning || viewModel.isCreatingBackup {
                 Section {
@@ -343,13 +426,13 @@ struct ServerInfoRow: View {
     let title: String
     let value: String
     let onCopy: (() -> Void)?
-    
+
     init(title: String, value: String, onCopy: (() -> Void)? = nil) {
         self.title = title
         self.value = value
         self.onCopy = onCopy
     }
-    
+
     var body: some View {
         HStack {
             Text(title)
@@ -359,7 +442,7 @@ struct ServerInfoRow: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .truncationMode(.middle)
-            
+
             if let onCopy {
                 Button(action: onCopy) {
                     Image(systemName: "document.on.document")
@@ -376,13 +459,13 @@ struct ServerInfoRow: View {
 struct SettingsIconView: View {
     let icon: String
     let color: Color
-    
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 6)
                 .fill(color.gradient)
                 .frame(width: 28, height: 28)
-            
+
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.white)

@@ -10,13 +10,15 @@ struct EditRecipeView: View {
     }
     
     @Environment(\.dismiss) var dismiss
+    @Environment(\.locale) private var locale
     @State private var localEditMode: EditMode = .inactive
     @State private var editingIngredientID: IdentifiableUUID?
-    
+
     private var numberFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = 2
+        formatter.locale = locale
         return formatter
     }
     

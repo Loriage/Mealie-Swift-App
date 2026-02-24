@@ -7,7 +7,16 @@ struct CalendarMonthView: View {
     let baseURL: URL?
     let onDateSelected: (Date) -> Void
 
-    private let daysOfWeek = ["L", "M", "M", "J", "V", "S", "D"]
+    @Environment(\.locale) private var locale
+
+    private var daysOfWeek: [String] {
+        var cal = Calendar.current
+        cal.locale = locale
+        let symbols = cal.veryShortWeekdaySymbols
+        let first = cal.firstWeekday - 1
+        return Array(symbols[first...]) + Array(symbols[..<first])
+    }
+
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
     
     var body: some View {
@@ -32,6 +41,8 @@ struct CalendarDayCell: View {
     let entries: [ReadPlanEntry]
     let isCurrentMonth: Bool
     let onTap: () -> Void
+
+    @Environment(\.locale) private var locale
     
     private var sortedEntries: [ReadPlanEntry] {
         entries.sorted {
@@ -53,7 +64,7 @@ struct CalendarDayCell: View {
         Button(action: onTap) {
             VStack(spacing: 2) {
                 if isCurrentMonth {
-                    Text(date.formatted(.dateTime.day()))
+                    Text(date.formatted(.dateTime.locale(locale).day()))
                         .font(.callout.bold())
                         .fontWeight(Calendar.current.isDateInToday(date) ? .heavy : .regular)
                         .foregroundColor(foregroundColorForDate)

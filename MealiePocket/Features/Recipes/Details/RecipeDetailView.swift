@@ -220,35 +220,43 @@ struct RecipeDetailView: View {
 
 private struct TimeInfoView: View {
     let label: LocalizedStringKey
-    let text: String
     let icon: String
-    
+    private let stringText: String?
+    private let rawDouble: Double?
+
+    @Environment(\.locale) private var locale
+
     init(icon: String = "clock", label: LocalizedStringKey, value: String?) {
         self.label = label
-        self.text = value ?? "N/A"
         self.icon = icon
+        self.stringText = value
+        self.rawDouble = nil
     }
-    
+
     init(icon: String, label: LocalizedStringKey, value: Double?) {
         self.label = label
         self.icon = icon
-        
-        if let numValue = value, numValue > 0 {
+        self.stringText = nil
+        self.rawDouble = value
+    }
+
+    private var displayText: String {
+        if let d = rawDouble, d > 0 {
             let formatter = NumberFormatter()
             formatter.minimumFractionDigits = 0
             formatter.maximumFractionDigits = 1
-            self.text = formatter.string(from: NSNumber(value: numValue)) ?? "N/A"
-        } else {
-            self.text = "N/A"
+            formatter.locale = locale
+            return formatter.string(from: NSNumber(value: d)) ?? "N/A"
         }
+        return stringText ?? "N/A"
     }
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             Label(label, systemImage: icon)
                 .font(.caption)
                 .foregroundColor(.secondary)
-            Text(text)
+            Text(displayText)
                 .fontWeight(.medium)
                 .lineLimit(1)
         }

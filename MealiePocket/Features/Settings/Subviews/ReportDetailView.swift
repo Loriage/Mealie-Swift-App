@@ -49,6 +49,7 @@ struct ReportDetailView: View {
 
 struct LogEntryView: View {
     let entry: ReportEntryOut
+    @Environment(\.locale) private var locale
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -78,11 +79,11 @@ struct LogEntryView: View {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         if let date = formatter.date(from: isoString) {
-            return date.formatted(date: .numeric, time: .shortened)
+            return date.formatted(Date.FormatStyle(date: .numeric, time: .shortened, locale: locale))
         }
         formatter.formatOptions = [.withInternetDateTime]
         if let date = formatter.date(from: isoString) {
-            return date.formatted(date: .numeric, time: .shortened)
+            return date.formatted(Date.FormatStyle(date: .numeric, time: .shortened, locale: locale))
         }
         return "Invalid Date"
     }

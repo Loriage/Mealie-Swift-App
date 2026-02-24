@@ -11,6 +11,7 @@ struct SelectRecipeForHomeSheetView: View {
     let mealTypes = ["Breakfast", "Lunch", "Dinner", "Side"]
 
     @Environment(\.dismiss) var dismiss
+    @Environment(\.locale) private var locale
 
     var body: some View {
         NavigationView {
@@ -42,7 +43,7 @@ struct SelectRecipeForHomeSheetView: View {
             }
             .listStyle(.plain)
             .searchable(text: $viewModel.searchQueryForSelection, prompt: "Search for a recipe...")
-            .navigationTitle("Add to \(date.formatted(date: .abbreviated, time: .omitted))")
+            .navigationTitle("Add to \(date.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, locale: locale)))")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) { Button("Cancel") { dismiss() } }
