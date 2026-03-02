@@ -20,7 +20,7 @@ class RecipeDetailViewModel {
     
     func loadRecipeDetail(slug: String, apiClient: MealieAPIClient?, userID: String?) async {
         guard let apiClient = apiClient, let userID = userID else {
-            errorMessage = "API client or User ID not available."
+            errorMessage = "error.apiClientOrIDUnavailable"
             isLoading = false
             return
         }
@@ -54,11 +54,7 @@ class RecipeDetailViewModel {
             await MainActor.run { isLoading = false }
         } catch {
             await MainActor.run {
-                if self.recipeDetail == nil {
-                    self.errorMessage = "Failed to load recipe details: \(error.localizedDescription)"
-                } else {
-                    self.errorMessage = "Failed to refresh details: \(error.localizedDescription)"
-                }
+                self.errorMessage = "error.loadingRecipeDetails"
                 self.isLoading = false
                 self.needsRefresh = false
             }
@@ -67,7 +63,7 @@ class RecipeDetailViewModel {
     
     func setRating(_ rating: Double, slug: String, apiClient: MealieAPIClient?, userID: String?) async {
         guard let apiClient = apiClient, let userID = userID else {
-            errorMessage = "API client or User ID not available."
+            errorMessage = "error.apiClientOrIDUnavailable"
             return
         }
         
@@ -84,14 +80,14 @@ class RecipeDetailViewModel {
         } catch {
             await MainActor.run {
                 self.recipeDetail?.userRating = previousRating
-                self.errorMessage = "Failed to set rating: \(error.localizedDescription)"
+                self.errorMessage = "error.settingRating"
             }
         }
     }
     
     func toggleFavorite(apiClient: MealieAPIClient?, userID: String?) async {
         guard let apiClient = apiClient, let userID = userID, let detail = recipeDetail else {
-            errorMessage = "Cannot toggle favorite: Missing data."
+            errorMessage = "error.toggleFavoriteMissingData"
             return
         }
         
@@ -113,27 +109,26 @@ class RecipeDetailViewModel {
         } catch {
             await MainActor.run {
                 isFavorite = originalFavoriteStatus
-                errorMessage = "Failed to update favorite status: \(error.localizedDescription)"
+                errorMessage = "error.updatingFavorite"
             }
         }
     }
     
-    func addToMealPlan(date: Date, mealType: String, apiClient: MealieAPIClient?) async {
+    func addToMealPlan(date: Date, mealType: MealType, apiClient: MealieAPIClient?) async {
         guard let apiClient = apiClient, let detail = recipeDetail else {
-            errorMessage = "Cannot add to plan: Missing data."
+            errorMessage = "error.addToPlanMissingData"
             return
         }
         
         do {
             try await apiClient.addMealPlanEntry(date: date, recipeId: detail.id, entryType: mealType)
-            print("Recette ajoutée au planning pour le \(date) - \(mealType)")
             await MainActor.run {
                 showingAddToPlanSheet = false
             }
         } catch APIError.unauthorized {
         } catch {
             await MainActor.run {
-                errorMessage = "Failed to add to meal plan: \(error.localizedDescription)"
+                errorMessage = "error.addingToMealPlan"
             }
         }
     }

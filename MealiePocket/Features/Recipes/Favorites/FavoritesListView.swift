@@ -96,11 +96,11 @@ struct FavoritesListView: View {
          }
     }
     
-    private func contentUnavailable(title: String, message: String, systemImage: String? = "exclamationmark.triangle") -> some View {
+    private func contentUnavailable(title: LocalizedStringKey, message: String, systemImage: String? = "exclamationmark.triangle") -> some View {
         ContentUnavailableView {
             Label(title, systemImage: systemImage ?? "exclamationmark.triangle")
         } description: {
-            Text(message)
+            Text(LocalizedStringKey(message))
         }
     }
 }

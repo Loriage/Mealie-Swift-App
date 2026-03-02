@@ -29,22 +29,22 @@ class LoginViewModel {
             .replacingOccurrences(of: "https://", with: "")
         
         guard let url = URL(string: fullURLString), var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            errorMessage = "Invalid server URL format."
+            errorMessage = "error.login.invalidURL"
             isLoading = false
             return
         }
-        
+
         components.path = ""
         guard let baseURL = components.url else {
-            errorMessage = "Could not construct base URL."
+            errorMessage = "error.login.cannotConstructURL"
             isLoading = false
             return
         }
-        
+
         switch mode {
         case .password:
             guard !username.isEmpty, !password.isEmpty else {
-                errorMessage = "Username and password are required."
+                errorMessage = "error.login.credentialsRequired"
                 isLoading = false
                 return
             }
@@ -53,19 +53,19 @@ class LoginViewModel {
                 let token = try await client.login(username: username, password: password)
                 await appState.login(baseURL: baseURL, token: token)
             } catch {
-                errorMessage = "Login failed. Check your credentials and server URL."
+                errorMessage = "error.login.failed"
             }
-            
+
         case .apiKey:
             guard !apiKey.isEmpty else {
-                errorMessage = "API Key is required."
+                errorMessage = "error.login.apiKeyRequired"
                 isLoading = false
                 return
             }
             await appState.loginWithApiKey(baseURL: baseURL, apiKey: apiKey)
-            
+
             if !appState.isAuthenticated {
-                errorMessage = "Login with API Key failed. Check the key and server URL."
+                errorMessage = "error.login.apiKeyFailed"
             }
         }
         

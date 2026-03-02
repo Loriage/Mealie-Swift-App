@@ -46,7 +46,7 @@ class ReportDetailViewModel {
     @MainActor
     func loadReportDetail(apiClient: MealieAPIClient?) async {
         guard let apiClient else {
-            errorMessage = "API Client not available."
+            errorMessage = "error.apiClientUnavailable"
             return
         }
         
@@ -56,7 +56,7 @@ class ReportDetailViewModel {
         do {
             self.reportDetail = try await apiClient.fetchReportDetail(id: reportSummary.id)
         } catch {
-            errorMessage = "Failed to load report details: \(error.localizedDescription)"
+            errorMessage = "error.loadingReportDetails"
         }
         
         isLoading = false

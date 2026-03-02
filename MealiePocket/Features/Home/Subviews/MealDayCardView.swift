@@ -15,9 +15,8 @@ struct MealDayCardView: View {
     private let maxEntriesToShow = 4
     private var sortedEntries: [ReadPlanEntry] {
         entries.sorted {
-            let typeOrder: [String: Int] = ["breakfast": 0, "lunch": 1, "dinner": 2, "side": 3]
-            let order1 = typeOrder[$0.entryType.lowercased()] ?? 4
-            let order2 = typeOrder[$1.entryType.lowercased()] ?? 4
+            let order1 = $0.mealType.sortOrder
+            let order2 = $1.mealType.sortOrder
             if order1 != order2 { return order1 < order2 }
             return ($0.recipe?.name ?? $0.title) < ($1.recipe?.name ?? $1.title)
         }
@@ -76,7 +75,7 @@ struct MealDayCardView: View {
             }
         }
         .padding()
-        .background(.thinMaterial) // not convinced by this. Will probably change later?
+        .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
     
@@ -113,13 +112,4 @@ struct MealDayCardView: View {
         }
     }
     
-    private func iconForEntryType(_ type: String) -> String {
-        switch type.lowercased() {
-        case "breakfast": return "sun.horizon.fill"
-        case "lunch": return "sun.max.fill"
-        case "dinner": return "moon.fill"
-        case "side": return "fork.knife"
-        default: return "note.text"
-        }
-    }
 }

@@ -117,9 +117,7 @@ class EditRecipeViewModel {
             
             self.allUnits = unitPagination.items
             
-        } catch {
-            print("Erreur de chargement des unités: \(error)")
-        }
+        } catch {}
     }
 
     func searchFoods(query: String, apiClient: MealieAPIClient?) async {
@@ -130,9 +128,7 @@ class EditRecipeViewModel {
         do {
             let foodPagination = try await apiClient.searchFoods(query: query)
             self.foodSearchResults = foodPagination.items
-        } catch {
-            print("Erreur de recherche d'aliments: \(error)")
-        }
+        } catch {}
     }
 
     @MainActor
@@ -143,14 +139,13 @@ class EditRecipeViewModel {
             let newFood = try await apiClient.createFood(name: name)
             return newFood
         } catch {
-            print("Erreur de création d'aliment: \(error.localizedDescription)")
             return nil
         }
     }
 
     func saveChanges(apiClient: MealieAPIClient?) async -> Bool {
         guard let apiClient = apiClient else {
-            errorMessage = "API Client missing."
+            errorMessage = "error.apiClientUnavailable"
             return false
         }
         
@@ -223,18 +218,7 @@ class EditRecipeViewModel {
             await MainActor.run { isLoading = false }
         } catch {
             await MainActor.run {
-                if let decodingError = error as? DecodingError {
-                    self.errorMessage = "Save Error (Encoding/Decoding): \(decodingError)"
-                } else if let apiError = error as? APIError {
-                    switch apiError {
-                    case .requestFailed(let statusCode, _):
-                        self.errorMessage = "Save Error (Server: \(statusCode))"
-                    default:
-                        self.errorMessage = "Save Error: \(error.localizedDescription)"
-                    }
-                } else {
-                    self.errorMessage = "Save Error: \(error.localizedDescription)"
-                }
+                self.errorMessage = "error.savingRecipe"
                 self.isLoading = false
             }
         }

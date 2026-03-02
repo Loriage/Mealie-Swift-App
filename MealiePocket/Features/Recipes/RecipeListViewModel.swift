@@ -31,17 +31,13 @@ class RecipeListViewModel {
             do {
                 try await Task.sleep(nanoseconds: 300_000_000)
                 await performSearchOrLoad(apiClient: apiClient, userID: userID, isSearching: true, loadMore: false)
-            } catch {
-                if !(error is CancellationError) {
-                    print("Erreur inattendue dans triggerSearch: \(error)")
-                }
-            }
+            } catch {}
         }
     }
 
     private func performSearchOrLoad(apiClient: MealieAPIClient?, userID: String?, isSearching: Bool, loadMore: Bool) async {
         guard let apiClient, let userID else {
-            errorMessage = "API client or User ID not available."
+            errorMessage = "error.apiClientOrIDUnavailable"
             return
         }
         
@@ -123,7 +119,7 @@ class RecipeListViewModel {
                 return
             }
             await MainActor.run {
-                self.errorMessage = "Failed to load or search recipes: \(error.localizedDescription)"
+                self.errorMessage = "error.loadingRecipes"
                 self.isLoading = false
                 self.isLoadingMore = false
             }
@@ -158,7 +154,7 @@ class RecipeListViewModel {
         } catch {
             updateFavoriteStatus(for: recipeId, in: &recipes)
             await MainActor.run {
-                self.errorMessage = "Failed to update favorite status: \(error.localizedDescription)"
+                self.errorMessage = "error.updatingFavorite"
             }
         }
     }

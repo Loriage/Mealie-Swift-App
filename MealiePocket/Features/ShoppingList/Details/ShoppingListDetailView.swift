@@ -32,7 +32,7 @@ struct ShoppingListDetailView: View {
                 ProgressView().frame(maxWidth: .infinity)
             } else if let errorMessage = viewModel.errorMessage {
                 Section {
-                    Text("Error: \(errorMessage)")
+                    Text(LocalizedStringKey(errorMessage))
                         .foregroundColor(.red)
                 }
             }

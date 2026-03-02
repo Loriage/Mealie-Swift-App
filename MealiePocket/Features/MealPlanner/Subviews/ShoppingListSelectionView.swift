@@ -18,7 +18,7 @@ struct ShoppingListSelectionView: View {
                         description: Text("First, create a shopping list in the Lists tab.")
                     )
                 } else if let error = viewModel.importErrorMessage, !viewModel.isImporting {
-                    ContentUnavailableView("Error", systemImage: "exclamationmark.triangle", description: Text(error))
+                    ContentUnavailableView("Error", systemImage: "exclamationmark.triangle", description: Text(LocalizedStringKey(error)))
                 } else {
                     List(viewModel.availableShoppingLists) { list in
                         Button {

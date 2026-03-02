@@ -34,7 +34,7 @@ struct RecipeDetailView: View {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .resizable().scaledToFit().frame(width: 50, height: 50).foregroundColor(.orange)
                         Text("Error").font(.title2).fontWeight(.bold)
-                        Text(errorMessage).font(.callout).multilineTextAlignment(.center).foregroundColor(.secondary).padding(.horizontal)
+                        Text(LocalizedStringKey(errorMessage)).font(.callout).multilineTextAlignment(.center).foregroundColor(.secondary).padding(.horizontal)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 50)
@@ -544,8 +544,7 @@ struct AddToMealPlanView: View {
     var apiClient: MealieAPIClient?
     
     @State private var selectedDate = Date()
-    @State private var selectedMealType = "Dinner"
-    let mealTypes = ["Breakfast", "Lunch", "Dinner", "Side"]
+    @State private var selectedMealType: MealType = .dinner
     
     @Environment(\.dismiss) var dismiss
     
@@ -555,8 +554,8 @@ struct AddToMealPlanView: View {
                 DatePicker("Date", selection: $selectedDate, displayedComponents: .date)
                 
                 Picker("Meal Type", selection: $selectedMealType) {
-                    ForEach(mealTypes, id: \.self) { type in
-                        Text(LocalizedStringKey(type)).tag(type)
+                    ForEach(MealType.allCases) { type in
+                        Text(LocalizedStringKey(type.displayName)).tag(type)
                     }
                 }
             }

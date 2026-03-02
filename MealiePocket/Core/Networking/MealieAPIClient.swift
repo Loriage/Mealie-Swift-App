@@ -14,25 +14,26 @@ enum APIError: Error {
 
 extension APIError: LocalizedError {
     var errorDescription: String? {
+        let b = AppLocale.bundle
         switch self {
         case .invalidURL:
-            return NSLocalizedString("Invalid URL provided.", comment: "API Error")
+            return NSLocalizedString("api.error.invalidURL", bundle: b, comment: "")
         case .requestFailed(let statusCode, _):
-            return NSLocalizedString("Request failed with status code: \(statusCode).", comment: "API Error")
+            return String(format: NSLocalizedString("api.error.requestFailed", bundle: b, comment: ""), statusCode)
         case .invalidResponse:
-            return NSLocalizedString("Received an invalid response from the server.", comment: "API Error")
-        case .decodingError(let error):
-            return NSLocalizedString("Failed to decode response: \(error.localizedDescription)", comment: "API Error")
+            return NSLocalizedString("api.error.invalidResponse", bundle: b, comment: "")
+        case .decodingError:
+            return NSLocalizedString("api.error.decodingError", bundle: b, comment: "")
         case .unauthorized:
-            return NSLocalizedString("Unauthorized. Please check credentials.", comment: "API Error")
+            return NSLocalizedString("api.error.unauthorized", bundle: b, comment: "")
         case .encodingError:
-            return NSLocalizedString("Failed to encode request body.", comment: "API Error")
+            return NSLocalizedString("api.error.encodingError", bundle: b, comment: "")
         case .tokenRefreshFailed:
-            return NSLocalizedString("Session expired and token refresh failed. Please log in again.", comment: "API Error")
+            return NSLocalizedString("api.error.tokenRefreshFailed", bundle: b, comment: "")
         case .timeout:
-            return NSLocalizedString("The request timed out. The server is still working in the background.", comment: "API Error")
-        case .unknown(let error):
-            return NSLocalizedString("An unknown error occurred: \(error.localizedDescription)", comment: "API Error")
+            return NSLocalizedString("api.error.timeout", bundle: b, comment: "")
+        case .unknown:
+            return NSLocalizedString("api.error.unknown", bundle: b, comment: "")
         }
     }
 }
@@ -208,7 +209,6 @@ class MealieAPIClient {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             return try decoder.decode(T.self, from: data)
         } catch {
-            print("Decoding Error: \(error)")
             throw APIError.decodingError(error)
         }
     }
@@ -379,7 +379,7 @@ class MealieAPIClient {
         let _: NoReply = try await performRequest(for: request)
     }
     
-    func addMealPlanEntry(date: Date, recipeId: UUID, entryType: String) async throws {
+    func addMealPlanEntry(date: Date, recipeId: UUID, entryType: MealType) async throws {
         let url = baseURL.appendingPathComponent("api/households/mealplans")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -392,7 +392,7 @@ class MealieAPIClient {
         let body = CreatePlanEntry(
             date: dateString,
             recipeId: recipeId.uuidString,
-            entryType: entryType.lowercased()
+            entryType: entryType.rawValue
         )
         
         do {
@@ -490,7 +490,7 @@ class MealieAPIClient {
         let _: ReadPlanEntry = try await performRequest(for: request)
     }
     
-    func addRandomMealPlanEntry(date: Date, entryType: String) async throws -> ReadPlanEntry {
+    func addRandomMealPlanEntry(date: Date, entryType: MealType) async throws -> ReadPlanEntry {
         let url = baseURL.appendingPathComponent("api/households/mealplans/random")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -502,7 +502,7 @@ class MealieAPIClient {
         
         let body = CreateRandomEntry(
             date: dateString,
-            entryType: entryType.lowercased()
+            entryType: entryType.rawValue
         )
         
         do {
@@ -728,7 +728,7 @@ class MealieAPIClient {
         return try await performLongTaskRequest(for: request)
     }
 
-    func rescheduleMealPlanEntry(entryID: Int, toDate: Date, recipeId: UUID, entryType: String) async throws {
+    func rescheduleMealPlanEntry(entryID: Int, toDate: Date, recipeId: UUID, entryType: MealType) async throws {
         try await addMealPlanEntry(date: toDate, recipeId: recipeId, entryType: entryType)
         try await deleteMealPlanEntry(entryID: entryID)
     }

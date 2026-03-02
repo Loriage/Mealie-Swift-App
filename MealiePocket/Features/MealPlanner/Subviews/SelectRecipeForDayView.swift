@@ -7,8 +7,7 @@ struct SelectRecipeForDayView: View {
     
     @State private var selectedRecipe: RecipeSummary? = nil
     @State private var showingMealTypeSelection = false
-    @State private var selectedMealType = "Dinner"
-    let mealTypes = ["Breakfast", "Lunch", "Dinner", "Side"]
+    @State private var selectedMealType: MealType = .dinner
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.locale) private var locale
@@ -68,7 +67,6 @@ struct SelectRecipeForDayView: View {
             .sheet(isPresented: $showingMealTypeSelection) {
                 MealTypeSelectionView(
                     selectedMealType: $selectedMealType,
-                    mealTypes: mealTypes,
                     onConfirm: {
                         if let recipe = selectedRecipe {
                             Task {
@@ -132,17 +130,16 @@ struct RecipeSelectionRow: View {
 }
 
 struct MealTypeSelectionView: View {
-    @Binding var selectedMealType: String
-    let mealTypes: [String]
+    @Binding var selectedMealType: MealType
     let onConfirm: () -> Void
     let onCancel: () -> Void
-    
+
     var body: some View {
         NavigationView {
             VStack {
                 Picker("Meal Type", selection: $selectedMealType) {
-                    ForEach(mealTypes, id: \.self) { type in
-                        Text(LocalizedStringKey(type)).tag(type)
+                    ForEach(MealType.allCases) { type in
+                        Text(LocalizedStringKey(type.displayName)).tag(type)
                     }
                 }
                 .pickerStyle(.wheel)

@@ -42,7 +42,7 @@ struct ShoppingListView: View {
                         }
                 }
                 if let errorMessage = viewModel.errorMessage, !viewModel.shoppingLists.isEmpty {
-                    Text(errorMessage)
+                    Text(LocalizedStringKey(errorMessage))
                         .foregroundColor(.red)
                         .listRowBackground(Color.clear)
                 }
@@ -61,7 +61,7 @@ struct ShoppingListView: View {
                     ContentUnavailableView(
                         "Error",
                         systemImage: "exclamationmark.triangle",
-                        description: Text(errorMessage)
+                        description: Text(LocalizedStringKey(errorMessage))
                     )
                 }
             }
@@ -132,7 +132,7 @@ struct EditShoppingListView: View {
                 
                 if let errorMessage = viewModel.errorMessage {
                     Section {
-                        Text(errorMessage)
+                        Text(LocalizedStringKey(errorMessage))
                             .foregroundColor(.red)
                     }
                 }

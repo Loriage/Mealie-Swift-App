@@ -7,8 +7,7 @@ struct SelectRecipeForHomeSheetView: View {
 
     @State private var selectedRecipe: RecipeSummary? = nil
     @State private var showingMealTypeSelection = false
-    @State private var selectedMealType = "Dinner"
-    let mealTypes = ["Breakfast", "Lunch", "Dinner", "Side"]
+    @State private var selectedMealType: MealType = .dinner
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.locale) private var locale
@@ -51,7 +50,6 @@ struct SelectRecipeForHomeSheetView: View {
             .sheet(isPresented: $showingMealTypeSelection) {
                  MealTypeSelectionView(
                      selectedMealType: $selectedMealType,
-                     mealTypes: mealTypes,
                      onConfirm: {
                          if let recipe = selectedRecipe {
                              Task {

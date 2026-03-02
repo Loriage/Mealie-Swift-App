@@ -78,7 +78,7 @@ struct LoginView: View {
             }
 
             if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
+                Text(LocalizedStringKey(errorMessage))
                     .foregroundColor(.red)
                     .font(.caption)
                     .multilineTextAlignment(.center)

@@ -21,8 +21,7 @@ struct MealPlannerView: View {
     }
     
     @State private var showingMealTypeSelection = false
-    @State private var selectedMealType = "Dinner"
-    let mealTypes = ["Breakfast", "Lunch", "Dinner", "Side", "Drink", "Dessert", "Snack"]
+    @State private var selectedMealType: MealType = .dinner
     
     @Environment(\.locale) private var locale
     @Environment(\.dismiss) var dismiss
@@ -44,7 +43,7 @@ struct MealPlannerView: View {
                 ProgressView()
                 Spacer()
             } else if let errorMessage = viewModel.errorMessage {
-                ContentUnavailableView("Error", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
+                ContentUnavailableView("Error", systemImage: "exclamationmark.triangle", description: Text(LocalizedStringKey(errorMessage)))
             } else {
                 calendarContent
             }
@@ -177,7 +176,6 @@ struct MealPlannerView: View {
             if let date = viewModel.dateForAddingRecipe {
                 MealTypeSelectionView(
                     selectedMealType: $selectedMealType,
-                    mealTypes: mealTypes,
                     onConfirm: {
                         Task {
                             await viewModel.addRandomMeal(date: date, mealType: selectedMealType)
@@ -219,7 +217,6 @@ struct MealPlannerView: View {
                         get: { viewModel.selectedRescheduleMealType },
                         set: { viewModel.selectedRescheduleMealType = $0 }
                     ),
-                    mealTypes: mealTypes,
                     onConfirm: {
                         viewModel.showingRescheduleSheet = false
                         if let entryID = viewModel.selectedRescheduleEntryID {
@@ -228,7 +225,7 @@ struct MealPlannerView: View {
                                     entryID: entryID,
                                     toDate: viewModel.selectedRescheduleDate,
                                     recipeId: recipeId,
-                                    mealType: viewModel.selectedRescheduleMealType.lowercased()
+                                    mealType: viewModel.selectedRescheduleMealType
                                 )
                             }
                         }
@@ -446,15 +443,10 @@ struct MealPlannerView: View {
     private func mealEntriesList(for date: Date, showType: Bool = false) -> some View {
         let entries = viewModel.mealPlanEntries[Calendar.current.startOfDay(for: date)] ?? []
         let sortedEntries = entries.sorted {
-            let typeOrder: [String: Int] = ["breakfast": 0, "lunch": 1, "dinner": 2, "side": 3]
-            let order1 = typeOrder[$0.entryType.lowercased()] ?? 4
-            let order2 = typeOrder[$1.entryType.lowercased()] ?? 4
-            if order1 != order2 {
-                return order1 < order2
-            }
-            let name1 = $0.recipe?.name ?? $0.title
-            let name2 = $1.recipe?.name ?? $1.title
-            return name1 < name2
+            let order1 = $0.mealType.sortOrder
+            let order2 = $1.mealType.sortOrder
+            if order1 != order2 { return order1 < order2 }
+            return ($0.recipe?.name ?? $0.title) < ($1.recipe?.name ?? $1.title)
         }
         
         if entries.isEmpty {
@@ -609,17 +601,12 @@ struct MealPlannerView: View {
         let dateKey = Calendar.current.startOfDay(for: viewModel.selectedDate)
         guard let entries = viewModel.mealPlanEntries[dateKey] else { return }
         let sortedEntries = entries.sorted {
-            let typeOrder: [String: Int] = ["breakfast": 0, "lunch": 1, "dinner": 2, "side": 3]
-            let order1 = typeOrder[$0.entryType.lowercased()] ?? 4
-            let order2 = typeOrder[$1.entryType.lowercased()] ?? 4
-            if order1 != order2 {
-                return order1 < order2
-            }
-            let name1 = $0.recipe?.name ?? $0.title
-            let name2 = $1.recipe?.name ?? $1.title
-            return name1 < name2
+            let order1 = $0.mealType.sortOrder
+            let order2 = $1.mealType.sortOrder
+            if order1 != order2 { return order1 < order2 }
+            return ($0.recipe?.name ?? $0.title) < ($1.recipe?.name ?? $1.title)
         }
-        
+
         let idsToDelete = offsets.map { sortedEntries[$0].id }
         
         Task {
@@ -630,33 +617,18 @@ struct MealPlannerView: View {
     }
     
     private func iconForEntryType(_ type: String) -> String {
-        switch type.lowercased() {
-        case "breakfast": return "sun.horizon.fill"
-        case "lunch": return "sun.max.fill"
-        case "dinner": return "moon.fill"
-        case "side": return "fork.knife"
-        default: return "note.text"
-        }
+        MealType(rawValue: type.lowercased())?.icon ?? "note.text"
     }
-    
+
     private func localizedMealTypeKey(_ type: String) -> LocalizedStringKey? {
-        switch type.lowercased() {
-        case "breakfast": return "Breakfast"
-        case "lunch": return "Lunch"
-        case "dinner": return "Dinner"
-        case "side": return "Side"
-        case "drink": return "Drink"
-        case "dessert": return "Dessert"
-        case "snack": return "Snack"
-        default: return nil
-        }
+        guard let mealType = MealType(rawValue: type.lowercased()) else { return nil }
+        return LocalizedStringKey(mealType.displayName)
     }
 }
 
 struct RescheduleSheet: View {
     @Binding var selectedDate: Date
-    @Binding var selectedMealType: String
-    let mealTypes: [String]
+    @Binding var selectedMealType: MealType
     let onConfirm: () -> Void
     let onCancel: () -> Void
     
@@ -682,8 +654,8 @@ struct RescheduleSheet: View {
                         .padding(.top, 12)
                     
                     Picker("Meal Type", selection: $selectedMealType) {
-                        ForEach(mealTypes, id: \.self) { type in
-                            Text(LocalizedStringKey(type))
+                        ForEach(MealType.allCases) { type in
+                            Text(LocalizedStringKey(type.displayName))
                                 .font(.title3)
                                 .tag(type)
                         }

@@ -49,11 +49,11 @@ class ShoppingListDetailViewModel {
     func loadListDetails(apiClient: MealieAPIClient?) async {
         self.apiClient = apiClient
         guard let apiClient else {
-            errorMessage = "API Client not available."
+            errorMessage = "error.apiClientUnavailable"
             return
         }
         guard shoppingListDetail != nil else {
-            errorMessage = "Shopping list not initialized."
+            errorMessage = "error.listNotInitialized"
             return
         }
         
@@ -94,7 +94,7 @@ class ShoppingListDetailViewModel {
         } catch APIError.unauthorized {
             
         } catch {
-            errorMessage = "Failed to load list details: \(error.localizedDescription)"
+            errorMessage = "error.loadingListDetails"
         }
         
         isLoading = false
@@ -104,11 +104,11 @@ class ShoppingListDetailViewModel {
     @MainActor
     func addItem() async {
         guard let apiClient, let listId = shoppingListDetail?.id else {
-            errorMessage = "Cannot add item: API client or List ID missing."
+            errorMessage = "error.cannotAddItem"
             return
         }
         guard !newItemNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            errorMessage = "Item name cannot be empty."
+            errorMessage = "error.itemNameEmpty"
             return
         }
         
@@ -131,7 +131,7 @@ class ShoppingListDetailViewModel {
         } catch APIError.unauthorized {
             
         } catch {
-            errorMessage = "Failed to add item: \(error.localizedDescription)"
+            errorMessage = "error.addingItem"
         }
         isLoading = false
     }
@@ -140,7 +140,6 @@ class ShoppingListDetailViewModel {
     func updateItemCheckedState(itemId: UUID, isChecked: Bool) {
         guard shoppingListDetail != nil,
               let index = shoppingListDetail!.listItems.firstIndex(where: { $0.id == itemId }) else {
-            print("Could not find item to update state.")
             return
         }
         
@@ -162,7 +161,7 @@ class ShoppingListDetailViewModel {
     @MainActor
     func updateItem(_ item: ShoppingListItem) async {
         guard let apiClient else {
-            errorMessage = "Cannot update item: API client missing."
+            errorMessage = "error.cannotUpdateItem"
             return
         }
         errorMessage = nil
@@ -175,15 +174,14 @@ class ShoppingListDetailViewModel {
         } catch APIError.unauthorized {
             
         } catch {
-            errorMessage = "Failed to update item: \(error.localizedDescription)"
-            print("Error saving item update, local state might be inconsistent.")
+            errorMessage = "error.updatingItem"
         }
     }
     
     @MainActor
     func importMealPlanIngredients(startDate: Date, endDate: Date) async {
         guard let apiClient, let listId = shoppingListDetail?.id else {
-            errorMessage = "Cannot import: API Client or List ID missing."
+            errorMessage = "error.cannotImport"
             return
         }
         
@@ -220,7 +218,7 @@ class ShoppingListDetailViewModel {
         } catch APIError.unauthorized {
             isLoadingImport = false
         } catch {
-            errorMessage = "Failed to import meal plan ingredients: \(error.localizedDescription)"
+            errorMessage = "error.importingIngredients"
             isLoadingImport = false
         }
         
@@ -231,10 +229,9 @@ class ShoppingListDetailViewModel {
     func importCurrentWeekIngredients() async {
         let calendar = Calendar.current
         guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: Date()) else {
-            errorMessage = "Could not determine current week interval."
+            errorMessage = "error.weekIntervalUnavailable"
             return
         }
-        print(weekInterval)
         let startDate = weekInterval.start
         
         let endDate = calendar.date(byAdding: .day, value: -1, to: weekInterval.end) ?? weekInterval.start
@@ -246,10 +243,9 @@ class ShoppingListDetailViewModel {
     func importNextWeekIngredients() async {
         let calendar = Calendar.current
         guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: (Date() + (3600 * 24 * 8))) else {
-            errorMessage = "Could not determine current week interval."
+            errorMessage = "error.weekIntervalUnavailable"
             return
         }
-        print(weekInterval)
         let startDate = weekInterval.start
         
         let endDate = calendar.date(byAdding: .day, value: -1, to: weekInterval.end) ?? weekInterval.start
@@ -260,7 +256,7 @@ class ShoppingListDetailViewModel {
     @MainActor
     func deleteItems(at offsets: IndexSet) async {
         guard let apiClient, let items = shoppingListDetail?.listItems else {
-            errorMessage = "Cannot delete items: API client or items missing."
+            errorMessage = "error.cannotDeleteItems"
             return
         }
         
@@ -281,7 +277,7 @@ class ShoppingListDetailViewModel {
                 }
                 break
             } catch {
-                errorMessage = "Failed to delete item '\(item.display ?? item.note ?? "")': \(error.localizedDescription)"
+                errorMessage = "error.deletingItem"
                 if shoppingListDetail != nil {
                     let originalIndex = originalIndices[idx]
                     let insertPos = min(originalIndex, shoppingListDetail!.listItems.count)

@@ -12,6 +12,10 @@ struct ReadPlanEntry: Codable, Identifiable, Hashable {
     let householdId: UUID
     var recipe: RecipeSummary?
 
+    var mealType: MealType {
+        MealType(rawValue: entryType.lowercased()) ?? .dinner
+    }
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }

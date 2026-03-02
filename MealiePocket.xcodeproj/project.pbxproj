@@ -36,11 +36,6 @@
 			path = MealiePocket;
 			sourceTree = "<group>";
 		};
-		87C130682F20FD7B0042B975 /* FastlaneSnapshot */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = FastlaneSnapshot;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,7 +54,6 @@
 			children = (
 				87C437372ED5F33C0014DEDE /* Localizable.xcstrings */,
 				87226E0B2EA6C90E00FBF5C7 /* MealiePocket */,
-				87C130682F20FD7B0042B975 /* FastlaneSnapshot */,
 				87226E0A2EA6C90E00FBF5C7 /* Products */,
 				87C436712ED5EF560014DEDE /* MealiePocket.icon */,
 			);

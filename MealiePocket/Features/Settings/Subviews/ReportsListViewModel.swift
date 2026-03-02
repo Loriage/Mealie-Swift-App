@@ -11,7 +11,7 @@ class ReportsListViewModel {
     @MainActor
     func loadReports(apiClient: MealieAPIClient?) async {
         guard let apiClient else {
-            errorMessage = "API Client not available."
+            errorMessage = "error.apiClientUnavailable"
             return
         }
         
@@ -25,7 +25,7 @@ class ReportsListViewModel {
                 self.reports = try await fetchAllReportsMerged(apiClient: apiClient)
             }
         } catch {
-            errorMessage = "Failed to load reports: \(error.localizedDescription)"
+            errorMessage = "error.loadingReports"
         }
         
         isLoading = false

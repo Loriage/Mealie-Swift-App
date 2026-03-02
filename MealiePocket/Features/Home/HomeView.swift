@@ -24,7 +24,7 @@ struct HomeView: View {
                         ContentUnavailableView(
                             "Error",
                             systemImage: "exclamationmark.triangle",
-                            description: Text(errorMessage)
+                            description: Text(LocalizedStringKey(errorMessage))
                         )
                         .padding(.vertical, 40)
                     } else if !viewModel.favoriteRecipes.isEmpty {
@@ -63,7 +63,7 @@ struct HomeView: View {
                         ContentUnavailableView(
                             "Error",
                             systemImage: "exclamationmark.triangle",
-                            description: Text(weeklyError)
+                            description: Text(LocalizedStringKey(weeklyError))
                         )
                         .padding(.vertical, 40)
                     }

@@ -122,7 +122,7 @@ struct EditRecipeView: View {
             
             if let errorMessage = viewModel.errorMessage {
                 Section {
-                    Text(errorMessage).foregroundColor(.red)
+                    Text(LocalizedStringKey(errorMessage)).foregroundColor(.red)
                 }
             }
         }

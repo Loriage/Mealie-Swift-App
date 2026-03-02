@@ -9,7 +9,7 @@ struct ReportDetailView: View {
             if viewModel.isLoading {
                 ProgressView()
             } else if let errorMessage = viewModel.errorMessage {
-                ContentUnavailableView("Error", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
+                ContentUnavailableView("Error", systemImage: "exclamationmark.triangle", description: Text(LocalizedStringKey(errorMessage)))
             } else if let _ = viewModel.reportDetail {
                 if viewModel.filteredEntries.isEmpty {
                     ContentUnavailableView(

@@ -20,7 +20,7 @@ class ShoppingListViewModel {
     @MainActor
     func loadShoppingLists(apiClient: MealieAPIClient?, loadMore: Bool = false) async {
         guard let apiClient else {
-            errorMessage = "API Client not available."
+            errorMessage = "error.apiClientUnavailable"
             return
         }
         
@@ -52,7 +52,7 @@ class ShoppingListViewModel {
         } catch APIError.unauthorized {
             
         } catch {
-            errorMessage = "Failed to load shopping lists: \(error.localizedDescription)"
+            errorMessage = "error.loadingShoppingLists"
         }
         
         isLoading = false
@@ -62,7 +62,7 @@ class ShoppingListViewModel {
     @MainActor
     func createOrUpdateShoppingList(apiClient: MealieAPIClient?) async {
         guard let apiClient else {
-            errorMessage = "API Client not available."
+            errorMessage = "error.apiClientUnavailable"
             isLoading = false
             return
         }
@@ -97,11 +97,9 @@ class ShoppingListViewModel {
             }
             resetAndDismissSheet()
         } catch APIError.unauthorized {
-            errorMessage = "Unauthorized. Please login again."
-        } catch let apiError as APIError {
-            errorMessage = "Failed to \(isUpdating ? "update" : "create") list: \(apiError)"
+            errorMessage = "error.unauthorized"
         } catch {
-            errorMessage = "Failed to \(isUpdating ? "update" : "create") list: \(error.localizedDescription)"
+            errorMessage = isUpdating ? "error.updatingList" : "error.creatingList"
         }
         isLoading = false
     }
@@ -110,7 +108,7 @@ class ShoppingListViewModel {
     @MainActor
     func deleteShoppingList(at offsets: IndexSet, apiClient: MealieAPIClient?) async {
         guard let apiClient else {
-            errorMessage = "API Client not available."
+            errorMessage = "error.apiClientUnavailable"
             return
         }
         
@@ -132,7 +130,7 @@ class ShoppingListViewModel {
                 try await apiClient.deleteShoppingList(listId: list.id)
                 
             } catch {
-                errorMessage = "Failed to delete '\(list.name ?? "Untitled")': \(error.localizedDescription)"
+                errorMessage = "error.deletingList"
                 
                 
                 let originalIndex = originalIndices[index]

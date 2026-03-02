@@ -59,7 +59,7 @@ class MealPlannerViewModel {
     var selectedRescheduleEntryID: Int? = nil
     var selectedRescheduleRecipeID: UUID? = nil
     var selectedRescheduleDate = Date()
-    var selectedRescheduleMealType = "Dinner"
+    var selectedRescheduleMealType: MealType = .dinner
     
     init() {
         setupInitialMonths()
@@ -233,8 +233,6 @@ class MealPlannerViewModel {
             for entry in response.items {
                 if let dayStart = calendarDate(from: entry.date) {
                     groupedEntries[dayStart, default: []].append(entry)
-                } else {
-                    print("Warning: Could not parse date string \(entry.date)")
                 }
             }
             
@@ -329,7 +327,6 @@ class MealPlannerViewModel {
                 }
             } catch {
                 await MainActor.run {
-                    print("Error searching recipes for selection: \(error)")
                     if !loadMore { self.recipesForSelection = [] }
                     self.isLoadingRecipesForSelection = false
                     self.isLoadingMoreRecipesForSelection = false
@@ -342,7 +339,7 @@ class MealPlannerViewModel {
         await searchRecipesForSelection(apiClient: apiClient, loadMore: true)
     }
     
-    func addSelectedRecipeToPlan(recipe: RecipeSummary, mealType: String, apiClient: MealieAPIClient?) async {
+    func addSelectedRecipeToPlan(recipe: RecipeSummary, mealType: MealType, apiClient: MealieAPIClient?) async {
         guard let date = dateForAddingRecipe, let apiClient = apiClient else {
             errorMessage = "error.missingDateOrClient"
             return
@@ -366,7 +363,7 @@ class MealPlannerViewModel {
         }
     }
 
-    func addRandomMeal(date: Date, mealType: String) async {
+    func addRandomMeal(date: Date, mealType: MealType) async {
         guard let date = dateForAddingRecipe, let apiClient = apiClient else {
             errorMessage = "error.apiClientUnavailable"
             return
@@ -417,7 +414,7 @@ class MealPlannerViewModel {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         selectedRescheduleDate = dateFormatter.date(from: entry.date) ?? Date()
-        selectedRescheduleMealType = entry.entryType.capitalized
+        selectedRescheduleMealType = entry.mealType
         
         selectedRescheduleEntryID = entry.id
         selectedRescheduleRecipeID = recipeId
@@ -425,7 +422,7 @@ class MealPlannerViewModel {
     }
 
     @MainActor
-    func rescheduleMealEntry(entryID: Int, toDate: Date, recipeId: UUID, mealType: String) async {
+    func rescheduleMealEntry(entryID: Int, toDate: Date, recipeId: UUID, mealType: MealType) async {
         guard let client = self.apiClient else {
             errorMessage = "error.apiClientUnavailable"
             return
@@ -475,7 +472,7 @@ class MealPlannerViewModel {
     func addWeek(apiClient: MealieAPIClient?) {
         let calendar = Calendar.current
         guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: selectedDate) else {
-            errorMessage = "Could not determine week interval."
+            errorMessage = "error.weekIntervalUnavailable"
             return
         }
         let endDate = calendar.date(byAdding: .day, value: -1, to: weekInterval.end) ?? weekInterval.start
@@ -510,7 +507,7 @@ class MealPlannerViewModel {
             let response = try await apiClient.fetchShoppingLists(page: 1, perPage: 500)
             self.availableShoppingLists = response.items
         } catch {
-            self.importErrorMessage = "Failed to load shopping lists: \(error.localizedDescription)"
+            self.importErrorMessage = "error.loadingShoppingLists"
         }
         
         isLoadingShoppingLists = false
@@ -547,11 +544,11 @@ class MealPlannerViewModel {
                 _ = try await apiClient.addRecipesToShoppingListBulk(listId: list.id, recipeIds: uniqueRecipeIds)
                 importSuccess = true
             } else {
-                importErrorMessage = "No recipes found in the selected date range."
+                importErrorMessage = "error.noRecipesInRange"
             }
             
         } catch {
-            importErrorMessage = "Failed to import ingredients: \(error.localizedDescription)"
+            importErrorMessage = "error.importingIngredients"
         }
         
         isImporting = false

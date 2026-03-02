@@ -46,7 +46,6 @@ class AppState {
             do {
                 self.currentUser = try JSONDecoder().decode(User.self, from: userData)
             } catch {
-                print("Failed to decode user from Keychain")
                 self.currentUser = nil
                 logout()
                 return
@@ -60,7 +59,6 @@ class AppState {
             do {
                 self.loginTime = try JSONDecoder().decode(Date.self, from: loginTimeData)
             } catch {
-                print("Failed to decode login time from Keychain")
                 self.loginTime = nil
             }
         } else {
@@ -93,10 +91,8 @@ class AppState {
                 if let tokenData = newToken.data(using: .utf8) {
                     let status = KeychainHelper.save(key: self.tokenKey, data: tokenData)
                     if status != noErr {
-                        print("Erreur Keychain: Sauvegarde du token rafraîchi échouée")
                         self.logout()
                     } else {
-                        print("Token rafraîchi et sauvegardé.")
                         self.apiClient?.setToken(newToken)
                     }
                 }

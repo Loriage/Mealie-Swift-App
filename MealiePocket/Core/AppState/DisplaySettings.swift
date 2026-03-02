@@ -24,7 +24,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
         didSet { UserDefaults.standard.set(theme.rawValue, forKey: "selectedTheme") }
     }
     var languageCode: String {
-        didSet { UserDefaults.standard.set(languageCode, forKey: "selectedLanguage") }
+        didSet {
+            UserDefaults.standard.set(languageCode, forKey: "selectedLanguage")
+            AppLocale.update(languageCode: languageCode)
+        }
     }
     var locale: Locale { languageCode == "system" ? .autoupdatingCurrent : Locale(identifier: languageCode) }
 
@@ -32,5 +35,6 @@ enum AppTheme: String, CaseIterable, Identifiable {
         let t = UserDefaults.standard.string(forKey: "selectedTheme") ?? "system"
         theme = AppTheme(rawValue: t) ?? .system
         languageCode = UserDefaults.standard.string(forKey: "selectedLanguage") ?? "system"
+        AppLocale.update(languageCode: languageCode)
     }
 }
