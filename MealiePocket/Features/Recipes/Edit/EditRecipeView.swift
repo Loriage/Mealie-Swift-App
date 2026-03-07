@@ -72,7 +72,10 @@ struct EditRecipeView: View {
                                 .tint(.primary)
                             }
                             
-                            TextEditor(text: $ingredient.note)
+                            TextEditor(text: Binding(
+                                get: { ingredient.note ?? "" },
+                                set: { ingredient.note = $0 }
+                            ))
                                 .frame(minHeight: 30)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)

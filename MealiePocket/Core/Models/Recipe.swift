@@ -108,13 +108,13 @@ struct RecipeIngredient: Codable, Identifiable, Hashable {
     var referenceId: String?
     var display: String
     var title: String?
-    var note: String
+    var note: String?
     var quantity: Double?
     var unit: IngredientUnitStub?
     var food: IngredientFoodStub?
     var originalText: String?
     
-    init(id: UUID = UUID(), referenceId: String? = nil, display: String = "", title: String? = nil, note: String = "", quantity: Double? = 0, unit: IngredientUnitStub? = nil, food: IngredientFoodStub? = nil, originalText: String? = nil) {
+    init(id: UUID = UUID(), referenceId: String? = nil, display: String = "", title: String? = nil, note: String? = nil, quantity: Double? = 0, unit: IngredientUnitStub? = nil, food: IngredientFoodStub? = nil, originalText: String? = nil) {
         self.id = id
         self.referenceId = referenceId
         self.display = display
