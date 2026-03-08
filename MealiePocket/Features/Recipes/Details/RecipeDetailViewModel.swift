@@ -133,6 +133,64 @@ class RecipeDetailViewModel {
         }
     }
     
+    // MARK: - Recipe Scaling
+    
+    var targetServings: Double? = nil
+    
+    var originalServings: Double? {
+        recipeDetail?.recipeServings
+    }
+    
+    var scaleFactor: Double {
+        IngredientScaler.scaleFactor(originalServings: originalServings, targetServings: targetServings)
+    }
+    
+    var isScaled: Bool {
+        guard let target = targetServings, let original = originalServings else { return false }
+        return abs(target - original) > 0.01
+    }
+    
+    var currentServings: Double? {
+        targetServings ?? originalServings
+    }
+    
+    func incrementServings() {
+        guard let current = currentServings else { return }
+        targetServings = current + 1
+    }
+    
+    func decrementServings() {
+        guard let current = currentServings, current > 1 else { return }
+        targetServings = current - 1
+    }
+    
+    func resetServings() {
+        targetServings = nil
+    }
+    
+    func scaledDisplayText(for ingredient: RecipeIngredient) -> String {
+        let scale = scaleFactor
+        guard scale != 1.0, let originalQty = ingredient.quantity, originalQty > 0 else {
+            return ingredient.display
+        }
+        
+        let scaledQty = originalQty * scale
+        let formattedQty = IngredientScaler.formatQuantity(scaledQty)
+        
+        var parts: [String] = [formattedQty]
+        if let unit = ingredient.unit {
+            parts.append(unit.name)
+        }
+        if let food = ingredient.food {
+            parts.append(food.name)
+        }
+        if !ingredient.note.isEmpty {
+            parts.append(ingredient.note)
+        }
+        
+        return parts.joined(separator: " ")
+    }
+    
     @MainActor
     func markForRefresh() {
         needsRefresh = true
