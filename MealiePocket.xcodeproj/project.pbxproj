@@ -12,6 +12,7 @@
 		B85017202F99714F00CEF492 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B850171F2F99714F00CEF492 /* WidgetKit.framework */; };
 		B85017222F99714F00CEF492 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B85017212F99714F00CEF492 /* SwiftUI.framework */; };
 		B850172F2F99715000CEF492 /* MealieWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B850171D2F99714F00CEF492 /* MealieWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B85017D62F99923100CEF492 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 87C437372ED5F33C0014DEDE /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -235,6 +236,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B85017D62F99923100CEF492 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
