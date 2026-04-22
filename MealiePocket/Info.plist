@@ -8,12 +8,12 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string></string>
+			<string>com.nohitdev.MealiePocket</string>
 			<key>CFBundleURLSchemes</key>
-			<array/>
+			<array>
+				<string>mealio</string>
+			</array>
 		</dict>
-		<dict/>
-		<dict/>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>

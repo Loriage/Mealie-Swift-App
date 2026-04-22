@@ -71,7 +71,7 @@ struct WidgetMeal: Identifiable {
 // MARK: - Shared Credentials
 
 struct WidgetCredentials {
-    static let suiteName  = "group.dev.karant.MealiePocket"
+    static let suiteName  = "group.com.nohitdev.MealiePocket"
     static let baseURLKey = "widget_baseURL"
     static let tokenKey   = "widget_token"
 

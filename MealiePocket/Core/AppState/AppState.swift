@@ -24,7 +24,7 @@ class AppState {
     private let loginTimeKey = "com.nohitdev.MealiePocket.loginTime"
 
     // Shared App Group used by the widget extension
-    private let widgetSuiteName = "group.dev.karant.MealiePocket"
+    private let widgetSuiteName = "group.com.nohitdev.MealiePocket"
     private let widgetBaseURLKey = "widget_baseURL"
     private let widgetTokenKey   = "widget_token"
     
