@@ -13,7 +13,7 @@ struct TodaysMealsWidget: Widget {
         }
         .configurationDisplayName("Today's Meals")
         .description("See what's on the menu today at a glance.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
     }
 }
 
@@ -26,11 +26,14 @@ struct TodaysMealsWidgetView: View {
     var body: some View {
         switch entry.state {
         case .notConfigured:
-            NotConfiguredView(compact: family == .systemSmall)
+            NotConfiguredView(compact: family == .systemSmall || family == .accessoryRectangular)
         case .loaded, .failed:
-            if family == .systemSmall {
+            switch family {
+            case .systemSmall:
                 SmallMealsContentView(entry: entry)
-            } else {
+            case .accessoryRectangular:
+                LockScreenMealsContentView(entry: entry)
+            default:
                 MealsContentView(entry: entry)
             }
         }
@@ -288,6 +291,89 @@ private struct SmallMealRowView: View {
     }
 }
 
+// MARK: - Lock Screen: Meals Content (accessoryRectangular)
+
+private struct LockScreenMealsContentView: View {
+    let entry: TodaysMealsEntry
+
+    private var isTomorrow: Bool { !Calendar.current.isDateInToday(entry.displayDate) }
+    private var headerTitle: String { isTomorrow ? "Tomorrow" : "Today" }
+    private var formattedDate: String {
+        entry.displayDate.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day())
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 1) {
+
+            // Header — widgetAccentable picks up the user's lock screen accent tint
+            HStack(spacing: 4) {
+                Image(systemName: "fork.knife")
+                    .font(.caption2.weight(.semibold))
+                    .widgetAccentable()
+                Text(headerTitle.uppercased())
+                    .font(.caption2.weight(.bold))
+                    .widgetAccentable()
+                Text("·")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Text(formattedDate)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Spacer()
+            }
+            .lineLimit(1)
+
+            if entry.meals.isEmpty {
+                Spacer(minLength: 0)
+                HStack(spacing: 5) {
+                    Image(systemName: "calendar.badge.plus")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Text("Nothing planned")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+            } else {
+                ForEach(Array(entry.meals.prefix(3))) { meal in
+                    LockScreenMealRow(meal: meal)
+                }
+                let overflow = max(0, entry.meals.count - 3)
+                if overflow > 0 {
+                    Text("+ \(overflow) more")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .widgetURL(URL(string: "mealio://planner"))
+    }
+}
+
+// MARK: - Lock Screen: Meal Row
+
+private struct LockScreenMealRow: View {
+    let meal: WidgetMeal
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Image(systemName: meal.icon)
+                .font(.system(size: 9))
+                .frame(width: 12)
+            Text(meal.mealType.capitalized)
+                .font(.system(size: 10, weight: .medium))
+                .frame(width: 52, alignment: .leading)
+                .lineLimit(1)
+            Text(meal.recipeName)
+                .font(.system(size: 10))
+                .lineLimit(1)
+                .truncationMode(.tail)
+        }
+        .foregroundStyle(.primary)
+    }
+}
+
 // MARK: - Empty State
 
 private struct EmptyMealsView: View {
@@ -324,6 +410,19 @@ private struct EmptyMealsView: View {
 }
 
 #Preview("Small", as: .systemSmall) {
+    TodaysMealsWidget()
+} timeline: {
+    TodaysMealsEntry.placeholder
+    TodaysMealsEntry.notConfigured
+    TodaysMealsEntry(
+        date: Date(),
+        displayDate: Calendar.current.date(byAdding: .day, value: 1, to: Date())!,
+        meals: [],
+        state: .loaded
+    )
+}
+
+#Preview("Lock Screen", as: .accessoryRectangular) {
     TodaysMealsWidget()
 } timeline: {
     TodaysMealsEntry.placeholder
