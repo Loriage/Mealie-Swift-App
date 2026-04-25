@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import WidgetKit
 
 @Observable
 class MealPlannerViewModel {
@@ -351,6 +352,7 @@ class MealPlannerViewModel {
         do {
             try await apiClient.addMealPlanEntry(date: date, recipeId: recipe.id, entryType: mealType)
             await loadMealPlan(apiClient: apiClient)
+            WidgetCenter.shared.reloadAllTimelines()
             await MainActor.run {
                 showingAddRecipeSheet = false
                 isLoading = false
@@ -375,6 +377,7 @@ class MealPlannerViewModel {
         do {
             let _ = try await apiClient.addRandomMealPlanEntry(date: date, entryType: mealType)
             await loadMealPlan(apiClient: apiClient)
+            WidgetCenter.shared.reloadAllTimelines()
             await MainActor.run {
                 showingMealTypeSelection = false
                 isLoading = false
@@ -399,6 +402,7 @@ class MealPlannerViewModel {
         do {
             try await client.deleteMealPlanEntry(entryID: entryID)
             await loadMealPlan(apiClient: client)
+            WidgetCenter.shared.reloadAllTimelines()
         } catch {
             await MainActor.run {
                 errorMessage = "error.deletingMeal"

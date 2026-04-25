@@ -5,3 +5,4 @@ screenshots.html
 FastlaneSnapshot/
 Snapfile
 Build/
+*DS_Store*

@@ -9,12 +9,24 @@ class AppState {
     var currentUser: User?
     var authMethod: AuthMethod?
     var loginTime: Date?
+
+    /// Set by the widget deep-link handler; consumed by MainTabView to open the add-meal sheet.
+    var pendingAddMealDate: Date? = nil
+
+    /// Set when a recipe row in the widget is tapped; consumed by MainTabView to open RecipeDetailView.
+    var pendingRecipeSlug: String? = nil
+    var pendingRecipeName: String = ""
     
     private let tokenKey = "com.nohitdev.MealiePocket.apiToken"
     private let baseURLKey = "com.nohitdev.MealiePocket.baseURL"
     private let userKey = "com.nohitdev.MealiePocket.user"
     private let authMethodKey = "com.nohitdev.MealiePocket.authMethod"
     private let loginTimeKey = "com.nohitdev.MealiePocket.loginTime"
+
+    // Shared App Group used by the widget extension
+    private let widgetSuiteName = "group.com.nohitdev.MealiePocket"
+    private let widgetBaseURLKey = "widget_baseURL"
+    private let widgetTokenKey   = "widget_token"
     
     enum AuthMethod: String {
         case token = "Password"
@@ -94,6 +106,8 @@ class AppState {
                         self.logout()
                     } else {
                         self.apiClient?.setToken(newToken)
+                        // Keep widget credentials in sync after a token refresh
+                        self.updateWidgetToken(newToken)
                     }
                 }
             }
@@ -168,6 +182,9 @@ class AppState {
             return
         }
         
+        // Persist credentials for the widget extension via shared App Group
+        saveWidgetCredentials(baseURL: baseURL, token: token)
+
         await MainActor.run {
             self.authMethod = authMethod
             self.loginTime = loginDate
@@ -181,7 +198,9 @@ class AppState {
         _ = KeychainHelper.delete(key: userKey)
         _ = KeychainHelper.delete(key: authMethodKey)
         _ = KeychainHelper.delete(key: loginTimeKey)
-        
+
+        clearWidgetCredentials()
+
         self.apiClient?.setToken(nil)
         self.apiClient = nil
         self.currentUser = nil
@@ -192,5 +211,23 @@ class AppState {
     
     deinit {
         cancellables.forEach { $0.cancel() }
+    }
+
+    // MARK: - Widget Credential Helpers
+
+    private func saveWidgetCredentials(baseURL: URL, token: String) {
+        guard let defaults = UserDefaults(suiteName: widgetSuiteName) else { return }
+        defaults.set(baseURL.absoluteString, forKey: widgetBaseURLKey)
+        defaults.set(token, forKey: widgetTokenKey)
+    }
+
+    private func clearWidgetCredentials() {
+        guard let defaults = UserDefaults(suiteName: widgetSuiteName) else { return }
+        defaults.removeObject(forKey: widgetBaseURLKey)
+        defaults.removeObject(forKey: widgetTokenKey)
+    }
+
+    private func updateWidgetToken(_ token: String) {
+        UserDefaults(suiteName: widgetSuiteName)?.set(token, forKey: widgetTokenKey)
     }
 }

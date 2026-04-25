@@ -9,12 +9,43 @@
 /* Begin PBXBuildFile section */
 		87C436722ED5EF560014DEDE /* MealiePocket.icon in Resources */ = {isa = PBXBuildFile; fileRef = 87C436712ED5EF560014DEDE /* MealiePocket.icon */; };
 		87C437382ED5F33C0014DEDE /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 87C437372ED5F33C0014DEDE /* Localizable.xcstrings */; };
+		B85017202F99714F00CEF492 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B850171F2F99714F00CEF492 /* WidgetKit.framework */; };
+		B85017222F99714F00CEF492 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B85017212F99714F00CEF492 /* SwiftUI.framework */; };
+		B850172F2F99715000CEF492 /* MealieWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B850171D2F99714F00CEF492 /* MealieWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B85017D62F99923100CEF492 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 87C437372ED5F33C0014DEDE /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B850172D2F99715000CEF492 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 87226E012EA6C90E00FBF5C7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B850171C2F99714F00CEF492;
+			remoteInfo = MealieWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B85017302F99715000CEF492 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B850172F2F99715000CEF492 /* MealieWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		87226E092EA6C90E00FBF5C7 /* MealiePocket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MealiePocket.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		87C436712ED5EF560014DEDE /* MealiePocket.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = MealiePocket.icon; sourceTree = "<group>"; };
 		87C437372ED5F33C0014DEDE /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		B850171D2F99714F00CEF492 /* MealieWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MealieWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B850171F2F99714F00CEF492 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		B85017212F99714F00CEF492 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -24,6 +55,13 @@
 				Info.plist,
 			);
 			target = 87226E082EA6C90E00FBF5C7 /* MealiePocket */;
+		};
+		B85017342F99715000CEF492 /* Exceptions for "MealieWidget" folder in "MealieWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B850171C2F99714F00CEF492 /* MealieWidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -36,6 +74,14 @@
 			path = MealiePocket;
 			sourceTree = "<group>";
 		};
+		B85017232F99714F00CEF492 /* MealieWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B85017342F99715000CEF492 /* Exceptions for "MealieWidget" folder in "MealieWidgetExtension" target */,
+			);
+			path = MealieWidget;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +89,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B850171A2F99714F00CEF492 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B85017222F99714F00CEF492 /* SwiftUI.framework in Frameworks */,
+				B85017202F99714F00CEF492 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,6 +109,8 @@
 			children = (
 				87C437372ED5F33C0014DEDE /* Localizable.xcstrings */,
 				87226E0B2EA6C90E00FBF5C7 /* MealiePocket */,
+				B85017232F99714F00CEF492 /* MealieWidget */,
+				B850171E2F99714F00CEF492 /* Frameworks */,
 				87226E0A2EA6C90E00FBF5C7 /* Products */,
 				87C436712ED5EF560014DEDE /* MealiePocket.icon */,
 			);
@@ -63,8 +120,18 @@
 			isa = PBXGroup;
 			children = (
 				87226E092EA6C90E00FBF5C7 /* MealiePocket.app */,
+				B850171D2F99714F00CEF492 /* MealieWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B850171E2F99714F00CEF492 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B850171F2F99714F00CEF492 /* WidgetKit.framework */,
+				B85017212F99714F00CEF492 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -77,10 +144,12 @@
 				87226E052EA6C90E00FBF5C7 /* Sources */,
 				87226E062EA6C90E00FBF5C7 /* Frameworks */,
 				87226E072EA6C90E00FBF5C7 /* Resources */,
+				B85017302F99715000CEF492 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B850172E2F99715000CEF492 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				87226E0B2EA6C90E00FBF5C7 /* MealiePocket */,
@@ -92,6 +161,28 @@
 			productReference = 87226E092EA6C90E00FBF5C7 /* MealiePocket.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B850171C2F99714F00CEF492 /* MealieWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B85017332F99715000CEF492 /* Build configuration list for PBXNativeTarget "MealieWidgetExtension" */;
+			buildPhases = (
+				B85017192F99714F00CEF492 /* Sources */,
+				B850171A2F99714F00CEF492 /* Frameworks */,
+				B850171B2F99714F00CEF492 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B85017232F99714F00CEF492 /* MealieWidget */,
+			);
+			name = MealieWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = MealieWidgetExtension;
+			productReference = B850171D2F99714F00CEF492 /* MealieWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -99,11 +190,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2600;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					87226E082EA6C90E00FBF5C7 = {
 						CreatedOnToolsVersion = 26.0;
+					};
+					B850171C2F99714F00CEF492 = {
+						CreatedOnToolsVersion = 26.4.1;
 					};
 				};
 			};
@@ -123,6 +217,7 @@
 			projectRoot = "";
 			targets = (
 				87226E082EA6C90E00FBF5C7 /* MealiePocket */,
+				B850171C2F99714F00CEF492 /* MealieWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -137,6 +232,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B850171B2F99714F00CEF492 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B85017D62F99923100CEF492 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -147,7 +250,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B85017192F99714F00CEF492 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B850172E2F99715000CEF492 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B850171C2F99714F00CEF492 /* MealieWidgetExtension */;
+			targetProxy = B850172D2F99715000CEF492 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		87226E122EA6C90F00FBF5C7 /* Debug */ = {
@@ -279,10 +397,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = MealiePocket;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MealiePocket/MealiePocket.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = VZFD28P342;
+				DEVELOPMENT_TEAM = 4FJJ765XZY;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -329,10 +448,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = MealiePocket;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MealiePocket/MealiePocket.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = VZFD28P342;
+				DEVELOPMENT_TEAM = 4FJJ765XZY;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -374,6 +494,73 @@
 			};
 			name = Release;
 		};
+		B85017312F99715000CEF492 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = MealieWidget/MealieWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = 4FJJ765XZY;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MealieWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MealieWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nohitdev.MealiePocket.MealieWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B85017322F99715000CEF492 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = MealieWidget/MealieWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = 4FJJ765XZY;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MealieWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MealieWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nohitdev.MealiePocket.MealieWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -391,6 +578,15 @@
 			buildConfigurations = (
 				87226E152EA6C90F00FBF5C7 /* Debug */,
 				87226E162EA6C90F00FBF5C7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B85017332F99715000CEF492 /* Build configuration list for PBXNativeTarget "MealieWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B85017312F99715000CEF492 /* Debug */,
+				B85017322F99715000CEF492 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
